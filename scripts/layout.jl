@@ -4,9 +4,15 @@ using Revise
 using Bonito
 using WGLMakie
 using Observables
+using Profile
+using ProfileView
 
 using BoundaryIntegralEquations
 using BoundaryIntegralEquations.DevTools
+
+
+
+WGLMakie.activate!(; resize_to=:parent)
 
 
 """
@@ -32,7 +38,7 @@ function DefaultCard(
             "width" => "100%",
             "height" => "100%",
             "box-sizing" => "border-box",
-            "overflow" => "hidden",
+            # "overflow" => "hidden",
         ),
         attributes...
     )
@@ -71,7 +77,7 @@ function Controls(callback::Function)
         ),
         bcampl=(
             "Amplitude",
-            Bonito.StylableSlider(-10:10)
+            Bonito.StylableSlider(-1:1)
         ),
         bcalpha=(
             "Spread",
@@ -85,6 +91,9 @@ function Controls(callback::Function)
             "Phase",
             Bonito.StylableSlider(0:0.1:2pi)
         ),
+        bccenter=(
+            "Center",
+            Bonito.StylableSlider(0:(pi/8):2pi; value=4pi / 8))
     )
 
     # on(bttn.value) do clicked # registers a Julia-side event handler.
@@ -174,7 +183,7 @@ mutable struct State
     sol
 end
 
-function make_plot(n)
+function make_plot(n; figsize=(200, 400))
 
     @info "making plot n=$n"
 
@@ -191,8 +200,8 @@ function make_plot(n)
     @info "plotting"
     @time begin
 
-        fig = Figure()
-        ax = Axis(fig[1, 1]; aspect=DataAspect(), tellheight=true)
+        fig = Figure(; size=figsize)
+        ax = Axis(fig[1, 1]; aspect=AxisAspect(1), tellheight=true)
         boundarycurve!(ax, @lift($state.pb.boundary))
 
         tcf = tricontourf!(ax, @lift $state.sol)
@@ -200,7 +209,12 @@ function make_plot(n)
         @show extrema(state[].sol.u)
         @show tcf.colorrange[]
 
-        Colorbar(fig[1, 1][1, 2], limits=@lift extrema($state.sol.u[.!isnan.($state.sol.u)]))
+        Colorbar(
+            fig[1, 1][1, 2],
+            limits=@lift(extrema($state.sol.u[.!isnan.($state.sol.u)])),
+            label="Electrostatic Potential",
+        )
+
 
         ax2 = Axis(fig[2, 1];
             limits=(nothing, (-1, 1)),
@@ -216,6 +230,7 @@ function make_plot(n)
 
     end
     @info "done plotting"
+    rowsize!(fig.layout, 2, Auto(0.2))
 
     @info fig, ax
     return fig
@@ -260,8 +275,9 @@ function client_state_cb!(s)
         α = _get(s, :bcalpha)
         ω = _get(s, :bcomega)
         ϕ = _get(s, :bcphase)
+        μ = _get(s, :bccenter)
 
-        return (A / (α * sqrt(2pi))) * exp(-(t - pi)^2 / (2α^2)) * sin(ω * t + ϕ)
+        return (A / (α * sqrt(2pi))) * exp(-(t - μ)^2 / (2α^2)) * sin(ω * t + ϕ)
     end
 
     bc = Dirichlet(
@@ -288,7 +304,7 @@ create a dashboard app
 function Dashboard()
 
     # The plot that the frontend displays
-    plot = make_plot(80)
+    plot = make_plot(80; figsize=(1300, 760))
 
     controls = Controls() do client_state # this is the callback passed to Controls
         client_state_cb!(client_state)
@@ -296,7 +312,7 @@ function Dashboard()
 
     sidebar = DefaultCard(
         controls,
-        style=Styles("grid-area" => "sidebar")
+        style=Styles("overflow-y" => "scroll", "grid-area" => "sidebar",)
     )
 
     header = DefaultCard(
@@ -305,12 +321,14 @@ function Dashboard()
     )
 
     main = DefaultCard(
-        plot,
-        style=Styles("grid-area" => "main")
+        plot
+        ;
+        style=Styles("grid-area" => "main"),
+        width="69px",
     )
 
     footer = DefaultCard(
-        "FOOTER",
+        DOM.a("GitHub"; href="https://github.com/sai-kalai/BoundaryIntegralEquations.jl"),
         style=Styles("grid-area" => "footer")
     )
 
@@ -352,10 +370,21 @@ end
 function make_app()
     grid = Dashboard()
 
-    global_style = Styles(CSS("body", "margin" => "0", "padding" => "0",))
+    global_style = Styles(
+        CSS("body", "margin" => "0", "padding" => "0",))
 
     app = App() do
-        return DOM.div(global_style, grid)
+        return DOM.div(
+            global_style,
+            DOM.div(grid
+                ;
+                style=Styles(
+                    "width" => "100%",
+                    "height" => "100vh",
+                    "overflow" => "hidden",
+                )
+            )
+        )
     end
 
     return app
@@ -364,5 +393,12 @@ end
 function main()
     app = make_app()
     server = start_server(app)
+end
+
+
+function prof_main()
+    @profview begin
+        main()
+    end
 end
 
