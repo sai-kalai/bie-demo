@@ -7,8 +7,8 @@ using Observables
 using Profile
 using ProfileView
 
-using BoundaryIntegralEquations
-using BoundaryIntegralEquations.DevTools
+using BoundaryIntegralPDE
+using BoundaryIntegralPDE.DevTools
 
 
 
