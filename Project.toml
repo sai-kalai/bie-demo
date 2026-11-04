@@ -1,3 +1,7 @@
+name = "DemoWebsite"
+uuid = "362f5ef0-bbd3-48d5-bb8b-c7f8d81d37ed"
+version = "0.1.0"
+
 [deps]
 Bonito = "824d6782-a2ef-11e9-3a09-e5662e0c26f8"
 BoundaryIntegralPDE = "58b2a5b9-46a1-47d2-a141-e25d04a557d9"
