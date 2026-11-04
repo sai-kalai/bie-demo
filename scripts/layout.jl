@@ -56,58 +56,40 @@ function simulate(pb; n_grid=50)
     return xs, ys, sol
 end
 
-function make_plot(n; figsize=(200, 400))
 
-    @info "making plot n=$n"
+function make_plot(state; figsize=(200, 400))
 
-    @time begin
-        t, pb = setup(n)
-        xs, ys, sol = simulate(pb) # this sol needs to be an observable
-    end
-
-    @info "done simulating"
-
-    global state
-    state = Observable(State(pb, sol))
-
-    @info "plotting"
-    @time begin
-
-        fig = Figure(; size=figsize)
-        # ax = Axis(fig[1, 1]; aspect=AxisAspect(1), tellheight=true)
-        ax = Axis3(fig[1, 1])
-
-        # boundarycurve!(ax, @lift($state.pb.boundary))
-
-        tcf = surface!(ax, @lift $state.sol)
-
-        @show extrema(state[].sol.u)
-        @show tcf.colorrange[]
-
-        Colorbar(
-            fig[1, 1][1, 2],
-            limits=@lift(extrema($state.sol.u[.!isnan.($state.sol.u)])),
-            label="Electrostatic Potential",
-        )
+    fig = Figure(; size=figsize)
+    # ax = Axis(fig[1, 1]; aspect=AxisAspect(1), tellheight=true)
+    ax = Axis3(fig[1, 1])
 
 
-        ax2 = Axis(fig[2, 1];
-            limits=(nothing, (-1, 1)),
-            xticks=MultiplesTicks(6, pi, "π"),
-            xlabel="Parameter t",
-            ylabel="Boundary Condition",
-            tellwidth=false,
-        )
-        lns = lines!(ax2,
-            @lift(get_t($state.pb.bc |> data |> length)),
-            @lift($state.pb.bc |> data)
-        )
+    tcf = surface!(ax, state.sol)
 
-    end
+    @info tcf
+
+    # Colorbar(
+    #     fig[1, 1][1, 2],
+    #     limits=@lift(extrema($state.sol.u[.!isnan.($state.sol.u)])),
+    #     label="Electrostatic Potential",
+    # )
+
+    ax2 = Axis(fig[2, 1];
+        limits=(nothing, (-1, 1)),
+        xticks=MultiplesTicks(6, pi, "π"),
+        xlabel="Parameter t",
+        ylabel="Boundary Condition",
+        tellwidth=false,
+    )
+
+    lns = lines!(ax2,
+        @lift(get_t($(state.sol).prob.bc |> data |> length)),
+        @lift($(state.sol).prob.bc |> data)
+    )
+
     @info "done plotting"
     rowsize!(fig.layout, 2, Auto(0.2))
 
-    @info fig, ax
     return WGLMakie.WithConfig(fig; resize_to=:parent)
 end
 
@@ -117,12 +99,7 @@ function _get(s, p)
     getproperty(s, p)[2].value[]
 end
 
-function client_state_cb!(s)
-
-    # numpoints_cb!(round(Int, client_state.numpoints[2].value[]))
-
-
-    # t = range(0, 2π; length=_get(s, :numpoints) + 1)[1:(end-1)]
+function client_state_cb!(state, s)
 
     t = get_t(_get(s, :numpoints))
 
@@ -152,14 +129,9 @@ function client_state_cb!(s)
     pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
 
     xs, ys, sol = simulate(pb)
-    global state
-    state[] = State(pb, sol)
-    @info extrema(sol.u[.!isnan.(sol.u)])
-    notify(state)
 
-    return nothing
-end
-
+    # set the observable state to the new simulation solution
+    state.sol[] = sol
 
     return nothing
 end
