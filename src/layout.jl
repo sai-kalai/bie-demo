@@ -86,12 +86,13 @@ end
 
 Construct the dashboard DOM.
 """
-function Dashboard()
+function Dashboard(state::State)
     # The plot that the frontend displays.
-    plot = make_plot(80; figsize=(1300, 760))
+
+    plot = make_plot(state; figsize=(1300, 760))
 
     controls = Controls() do client_state
-        client_state_cb!(client_state)
+        client_state_cb!(state, client_state)
     end
 
     sidebar = DefaultCard(
@@ -135,18 +136,3 @@ function Dashboard()
     )
 end
 
-function make_app()
-    grid = Dashboard()
-
-    # Load the external stylesheet as a Bonito asset.
-    stylesheet = Bonito.Asset(
-        joinpath(@__DIR__, "..", "assets", "styles.css")
-    )
-
-    return App() do
-        DOM.div(
-            stylesheet,
-            DOM.div(grid; class="dashboard-root"),
-        )
-    end
-end
