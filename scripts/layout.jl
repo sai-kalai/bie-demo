@@ -11,9 +11,6 @@ using BoundaryIntegralPDE.DevTools
 using DemoWebsite
 
 
-WGLMakie.activate!(; resize_to=:parent)
-
-
 function get_t(n)
     range(0, 2π; length=n + 1)[1:(end-1)]
 end
@@ -111,7 +108,7 @@ function make_plot(n; figsize=(200, 400))
     rowsize!(fig.layout, 2, Auto(0.2))
 
     @info fig, ax
-    return fig
+    return WGLMakie.WithConfig(fig; resize_to=:parent)
 end
 
 function numpoints_cb!(n::Int)
