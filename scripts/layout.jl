@@ -161,16 +161,8 @@ function client_state_cb!(s)
 end
 
 
-function start_server(app)
-    server = Server(app, "0.0.0.0", 8080)
-    route!(server, "/" => app)
-    return server
+    return nothing
 end
 
-
-function main()
-    app = make_app()
-    server = start_server(app)
-end
 
 
