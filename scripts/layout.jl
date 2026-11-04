@@ -59,11 +59,6 @@ function simulate(pb; n_grid=50)
     return xs, ys, sol
 end
 
-mutable struct State
-    pb
-    sol
-end
-
 function make_plot(n; figsize=(200, 400))
 
     @info "making plot n=$n"
