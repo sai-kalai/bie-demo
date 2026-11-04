@@ -111,16 +111,6 @@ function make_plot(n; figsize=(200, 400))
     return WGLMakie.WithConfig(fig; resize_to=:parent)
 end
 
-function numpoints_cb!(n::Int)
-    @info "callback n=$n"
-    t, pb = setup(n)
-    xs, ys, sol = simulate(pb)
-    global state
-    state[] = State(pb, sol)
-    @info extrema(sol.u[.!isnan.(sol.u)])
-    notify(state)
-    return nothing
-end
 
 
 function _get(s, p)
