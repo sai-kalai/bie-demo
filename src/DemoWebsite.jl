@@ -14,6 +14,7 @@ abstract type AbstractControl end
 
 include("tree.jl")
 include("control.jl")
+include("compute.jl")
 include("state.jl")
 include("startup.jl")
 include("layout.jl")
