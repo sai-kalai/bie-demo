@@ -15,23 +15,6 @@ function get_t(n)
     range(0, 2π; length=n + 1)[1:(end-1)]
 end
 
-function setup(n)
-
-    @info "setup n=$n"
-
-    t = get_t(n)
-
-    b = DiscreteClosedCurve(t, starfish)
-
-    f = 10
-
-    bc = Dirichlet(sin.(f .* t))
-
-    pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
-
-    return t, pb
-end
-
 
 function simulate(pb; n_grid=50)
     @info "simulate boundary = $(pb.boundary.x|>summary)"
@@ -55,7 +38,6 @@ function simulate(pb; n_grid=50)
 
     return xs, ys, sol
 end
-
 
 function make_plot(state; figsize=(200, 400))
 

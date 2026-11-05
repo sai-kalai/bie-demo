@@ -9,6 +9,15 @@ function start_server(app)
     return server
 end
 
+function default_state()
+    control_tree = default_control_tree()
+
+    sol = sol_from_controls(control_tree)
+
+    state = State(Observable(sol), Observable(0.), control_tree)
+    return state
+end
+
 function make_app()
     # Load the external stylesheet as a Bonito asset.
     stylesheet = Bonito.Asset(
@@ -16,13 +25,8 @@ function make_app()
     )
 
     return App() do session, request
-        client_state = default_client_state()
 
-        control_tree = default_control_tree()
-
-        sol = sol_from_client_state(client_state)
-
-        state = State(sol, 0., control_tree)
+        state = default_state()
 
         dashboard = Dashboard(state)
         # TODO: compute initial state in this callback so that it's unique to the session
@@ -32,39 +36,63 @@ function make_app()
         )
     end
 end
-
 function default_control_tree()
-    boundary = ControlGroup(
-        "boundary",
-        AbstractControlNode[
-            RealValued("numpoints", 40:10:100; value=40),
-            RealValued("bdryrotation", 0.0:0.1:2π; value=0.0),
-            RealValued("bdrysize", 0.8:0.1:3.0),
-            RealValued("bdryfreq", 2:10; value=5),
-            RealValued("bdryampl", 0.3:0.1:2.0),
-        ],
-    )
-
-    boundary_condition = ControlGroup(
-        "boundary_condition",
-        AbstractControlNode[
-            RealValued("bcampl", -1:1),
-            RealValued("bcalpha", 0.1:0.1:5.0; value=1.0),
-            RealValued("bcomega", -10.0:0.1:10.0),
-            RealValued("bcphase", 0.0:0.1:2π),
-            RealValued("bccenter", 0.0:(π/8):2π; value=π / 2),
-        ],
-    )
-
-    return ControlGroup(
-        "root",
-        AbstractControlNode[
-            boundary,
-            boundary_condition,
-        ],
-    )
+    return Node(:root, nothing, [
+        Node(:boundary, nothing, [
+            Node(:numpoints, RealValued(40:10:100; value=40)),
+            Node(:rotation, RealValued(0.0:0.1:2π; value=0.0)),
+            Node(:size, RealValued(0.8:0.1:3.0)),
+            Node(:freq, RealValued(2:10; value=5)),
+            Node(:ampl, RealValued(0.3:0.1:2.0)),
+        ]),
+        Node(:bc, nothing, [
+            Node(:ampl, RealValued(-1:1)),
+            Node(:alpha, RealValued(0.1:0.1:5.0; value=1.0)),
+            Node(:omega, RealValued(-10.0:0.1:10.0)),
+            Node(:phase, RealValued(0.0:0.1:2π)),
+            Node(:center, RealValued(0.0:(π/8):2π; value=π / 2)),
+        ],)
+    ])
 end
 
+# TODO: config struct with fixed schema for a specific application
+
+function problem_from_controls(tree::Node)
+
+    t = get_t(getcontrol(tree, :boundary, :numpoints).state[])
+
+    b = DiscreteClosedCurve(t, (t) -> starfish(
+        t;
+        t0=getcontrol(tree, :boundary, :rotation).state[],
+        R=getcontrol(tree, :boundary, :size).state[],
+        a=getcontrol(tree, :boundary, :ampl).state[],
+        w=getcontrol(tree, :boundary, :freq).state[],
+    ))
+
+    bc_fn = (_t) -> begin
+        A = getcontrol(tree, :bc, :ampl).state[]
+        α = getcontrol(tree, :bc, :alpha).state[]
+        ω = getcontrol(tree, :bc, :omega).state[]
+        ϕ = getcontrol(tree, :bc, :phase).state[]
+        μ = getcontrol(tree, :bc, :center).state[]
+
+        return (A / (α * sqrt(2pi))) * exp(-(_t - μ)^2 / (2α^2)) * sin(ω * _t + ϕ)
+    end
+
+    bc = Dirichlet(
+        bc_fn.(t)
+    )
+
+    pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
+    return pb
+end
+
+function sol_from_controls(c)
+    pb = problem_from_controls(c)
+    xs, ys, sol = simulate(pb)
+
+    return sol
+end
 
 # read data from client and produce a new simulation solution
 function sol_from_client_state(s)
@@ -102,17 +130,3 @@ function sol_from_client_state(s)
 end
 
 
-# just for testing
-function default_state()
-    # initialize the state
-    sol = default_sol()
-    state = State(sol)
-    return state
-end
-
-function default_sol()
-    n = 100
-    t, pb = setup(n)
-    xs, ys, sol = simulate(pb) # this sol needs to be an observable
-    return sol
-end
