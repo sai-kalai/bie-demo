@@ -14,10 +14,8 @@ function DefaultCard(content=DOM.div(); class_name)
     return Card(content; class=class_name)
 end
 
-
-function Controls(callback::Function)
-    # These are Observable objects, and their state belongs to the session.
-    client_state = (;
+function default_client_state()
+    (;
         numpoints=(
             "Number of Boundary Nodes",
             Bonito.StylableSlider(40:10:100; value=40)
@@ -60,6 +58,11 @@ function Controls(callback::Function)
         )
     )
 
+end
+
+function Controls(callback::Function)
+    # These are Observable objects, and their state belongs to the session.
+    client_state = default_client_state()
     # Preserve the existing callback behavior.
     # TODO: investigate forany
     foreach(client_state) do (name, widget)
