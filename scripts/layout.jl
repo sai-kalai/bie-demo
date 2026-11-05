@@ -99,36 +99,11 @@ function _get(s, p)
     getproperty(s, p)[2].value[]
 end
 
+# modify the application state by reading the client state
 function client_state_cb!(state, s)
 
-    t = get_t(_get(s, :numpoints))
-
-    b = DiscreteClosedCurve(t, (t) -> starfish(
-        t;
-        t0=_get(s, :bdryrotation),
-        R=_get(s, :bdrysize),
-        a=_get(s, :bdryampl),
-        w=_get(s, :bdryfreq),
-    ))
-
-
-    bc_fn = (t) -> begin
-        A = _get(s, :bcampl)
-        α = _get(s, :bcalpha)
-        ω = _get(s, :bcomega)
-        ϕ = _get(s, :bcphase)
-        μ = _get(s, :bccenter)
-
-        return (A / (α * sqrt(2pi))) * exp(-(t - μ)^2 / (2α^2)) * sin(ω * t + ϕ)
-    end
-
-    bc = Dirichlet(
-        bc_fn.(t)
-    )
-
-    pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
-
-    xs, ys, sol = simulate(pb)
+    # recompute solution
+    sol = sol_from_client_state(s)
 
     # set the observable state to the new simulation solution
     state.sol[] = sol
