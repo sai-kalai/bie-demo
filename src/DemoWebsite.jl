@@ -18,6 +18,8 @@ include("compute.jl")
 include("state.jl")
 include("startup.jl")
 include("layout.jl")
+include("figures/surface.jl")
+
 
 
 export DefaultCard, Controls, Dashboard, make_app
