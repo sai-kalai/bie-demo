@@ -18,6 +18,9 @@ function default_state()
     return state
 end
 
+
+STATE=nothing
+
 function make_app()
     # Load the external stylesheet as a Bonito asset.
     stylesheet = Bonito.Asset(
@@ -27,6 +30,9 @@ function make_app()
     return App() do session, request
 
         state = default_state()
+
+        global STATE
+        STATE = state # for debug
 
         dashboard = Dashboard(state)
         # TODO: compute initial state in this callback so that it's unique to the session
