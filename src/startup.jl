@@ -9,16 +9,22 @@ function start_server(app)
     return server
 end
 
-function make_app(state::State)
-    dashboard = Dashboard(state)
+function make_app()
 
     # Load the external stylesheet as a Bonito asset.
     stylesheet = Bonito.Asset(
         joinpath(@__DIR__, "..", "assets", "styles.css")
     )
 
-    return App() do
-# TODO: compute initial state in this callback so that it's unique to the session
+    return App() do session, request
+        client_state = default_client_state()
+
+        sol = sol_from_client_state(client_state)
+
+        state = State(sol)
+
+        dashboard = Dashboard(state)
+        # TODO: compute initial state in this callback so that it's unique to the session
         DOM.div(
             stylesheet,
             DOM.div(dashboard; class="dashboard-root"),
