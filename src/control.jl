@@ -17,12 +17,10 @@ struct ControlGroup <: AbstractControlNode
     controls::Vector{AbstractControlNode} # possible child nodes
     filter::Function # determines what nodes are active w.r.t current state
 
-    function ControlGroup(id)
-        return ControlGroup(id, AbstractControlNode[], _alltrue)
-    end
-
 end
-
+function ControlGroup(id, controls=AbstractControlNode[])
+    return ControlGroup(id, controls, _alltrue)
+end
 function push!(g::ControlGroup, vals...)
     push!(g.controls, vals...)
 end
@@ -35,12 +33,12 @@ struct RealValued{T,R<:AbstractRange{T}} <: AbstractControlNode
     filter::Function
 
     cur::Observable{T} # current value
-    range::R
+    range::R # TODO: make observable, some configurations may be invalid after state changes
 
 end
 function RealValued(id, range; value=first(range),
     controls=AbstractControlNode[], filter=_alltrue)
-    return RealValued(id, controls, filter, value, range)
+    return RealValued(id, controls, filter, Observable(value), range)
 end
 
 # e.g. dropdown menu
@@ -76,7 +74,7 @@ function print_tree(io::IO, node::AbstractControlNode, prefix="", is_last=true)
     if node isa ControlGroup
         println(io, "ControlGroup ($(node.id))")
     elseif node isa RealValued
-        println(io, "RealValued ($(node.id)): $(node.cur) ∈ [$(node.min), $(node.max)], step=$(node.step)")
+        println(io, "RealValued ($(node.id)): $(node.cur) ∈ $(node.range)")
     elseif node isa CategoricalEnumeration
         println(io, "CategoricalEnumeration ($(node.id)): $(node.variants)")
     elseif node isa Boolean
