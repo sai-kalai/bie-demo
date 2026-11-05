@@ -10,7 +10,6 @@ function start_server(app)
 end
 
 function make_app()
-
     # Load the external stylesheet as a Bonito asset.
     stylesheet = Bonito.Asset(
         joinpath(@__DIR__, "..", "assets", "styles.css")
@@ -30,6 +29,10 @@ function make_app()
             DOM.div(dashboard; class="dashboard-root"),
         )
     end
+end
+
+function default_control_tree()
+
 end
 
 

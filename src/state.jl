@@ -1,17 +1,20 @@
 """
 Representation of the application state: the problem, solution, and algorithm
+and also the controllable parameters
 
 """
 
-struct State
-    sol::Observable{Any} # solution to a bvp
-    t::Observable{Float64} # current time being visualized
+struct State{S,T,N<:AbstractControlNode}
+    sol::Observable{S} # solution to a bvp, contains full information
+    t::Observable{T} # current time being visualized
+
+    # tree of controllable options
+    controls::N
 end
 
+
 function State(sol::BVPSolution)
-
-    State(sol, 0.)
-
+    State(Observable(sol), Observable(0.), NullNode())
 end
 
 
