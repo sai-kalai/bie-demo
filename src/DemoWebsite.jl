@@ -20,16 +20,13 @@ export DefaultCard, Controls, Dashboard, make_app
 
 export State
 
-
-export start_server, make_app, default_state
+export start_server, make_app
 
 export main
 
 
 function main()
-
-    state = default_state()
-    app = make_app(state)
+    app = make_app()
     server = start_server(app)
 end
 
