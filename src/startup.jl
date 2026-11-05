@@ -32,15 +32,54 @@ function make_app()
     end
 end
 
-function make_app()
-    state = default_state()
-    make_app(state)
+
+# read data from client and produce a new simulation solution
+function sol_from_client_state(s)
+
+    t = get_t(_get(s, :numpoints))
+
+    b = DiscreteClosedCurve(t, (t) -> starfish(
+        t;
+        t0=_get(s, :bdryrotation),
+        R=_get(s, :bdrysize),
+        a=_get(s, :bdryampl),
+        w=_get(s, :bdryfreq),
+    ))
+
+
+    bc_fn = (t) -> begin
+        A = _get(s, :bcampl)
+        α = _get(s, :bcalpha)
+        ω = _get(s, :bcomega)
+        ϕ = _get(s, :bcphase)
+        μ = _get(s, :bccenter)
+
+        return (A / (α * sqrt(2pi))) * exp(-(t - μ)^2 / (2α^2)) * sin(ω * t + ϕ)
+    end
+
+    bc = Dirichlet(
+        bc_fn.(t)
+    )
+
+    pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
+
+    xs, ys, sol = simulate(pb)
+
+    return sol
 end
 
+
+# just for testing
 function default_state()
+    # initialize the state
+    sol = default_sol()
+    state = State(sol)
+    return state
+end
+
+function default_sol()
     n = 100
     t, pb = setup(n)
     xs, ys, sol = simulate(pb) # this sol needs to be an observable
-    # initialize the state
-    state = State(sol)
+    return sol
 end
