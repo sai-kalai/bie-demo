@@ -4,6 +4,7 @@ module DemoWebsite
 
 using Bonito
 using WGLMakie
+using StaticArrays
 
 
 
@@ -12,9 +13,11 @@ using BoundaryIntegralPDE.DevTools
 
 
 include("../scripts/layout.jl")
+include("control.jl")
 include("state.jl")
 include("startup.jl")
 include("layout.jl")
+
 
 export DefaultCard, Controls, Dashboard, make_app
 
