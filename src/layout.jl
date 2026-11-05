@@ -12,6 +12,10 @@ function DefaultCard(content=DOM.div(); class_name)
     return Card(content; class=class_name)
 end
 
+function get_t(n)
+    range(0, 2π; length=n + 1)[1:(end-1)]
+end
+
 function default_client_state()
     (;
         numpoints=(
