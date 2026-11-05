@@ -4,7 +4,7 @@ and also the controllable parameters
 
 """
 
-struct State{S,T,N<:AbstractControlNode}
+struct State{S,T,N}
     sol::Observable{S} # solution to a bvp, contains full information
     t::Observable{T} # current time being visualized
 
@@ -13,8 +13,8 @@ struct State{S,T,N<:AbstractControlNode}
 end
 
 
-function State(sol::BVPSolution)
-    State(Observable(sol), Observable(0.), NullNode())
+function State(sol::BVPSolution, controls)
+    State(Observable(sol), Observable(0.), controls)
 end
 
 
