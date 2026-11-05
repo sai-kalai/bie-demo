@@ -18,3 +18,15 @@ function State(sol::BVPSolution, controls)
 end
 
 
+# just for fun
+function dance(state, n=100)
+    for i in 1:n
+
+        for c in state.controls[:bc].children
+            c.control.state[] += 0.01*randn()
+        end
+        sync!(state)
+        sleep(1/60)
+
+    end
+end
