@@ -18,9 +18,11 @@ function make_app()
     return App() do session, request
         client_state = default_client_state()
 
+        control_tree = default_control_tree()
+
         sol = sol_from_client_state(client_state)
 
-        state = State(sol)
+        state = State(sol, 0., control_tree)
 
         dashboard = Dashboard(state)
         # TODO: compute initial state in this callback so that it's unique to the session
@@ -31,9 +33,7 @@ function make_app()
     end
 end
 
-
 function default_control_tree()
-
     boundary = ControlGroup(
         "boundary",
         AbstractControlNode[
@@ -43,7 +43,6 @@ function default_control_tree()
             RealValued("bdryfreq", 2:10; value=5),
             RealValued("bdryampl", 0.3:0.1:2.0),
         ],
-        always,
     )
 
     boundary_condition = ControlGroup(
@@ -55,7 +54,6 @@ function default_control_tree()
             RealValued("bcphase", 0.0:0.1:2π),
             RealValued("bccenter", 0.0:(π/8):2π; value=π / 2),
         ],
-        always,
     )
 
     return ControlGroup(
@@ -64,7 +62,6 @@ function default_control_tree()
             boundary,
             boundary_condition,
         ],
-        always,
     )
 end
 
