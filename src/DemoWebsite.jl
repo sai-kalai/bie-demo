@@ -12,7 +12,6 @@ using BoundaryIntegralPDE.DevTools
 
 abstract type AbstractControl end
 
-include("../scripts/layout.jl")
 include("tree.jl")
 include("control.jl")
 include("state.jl")
