@@ -8,23 +8,39 @@ abstract type AbstractControlNode end
 
 struct NullNode <: AbstractControlNode end
 
+_alltrue(args...) = true
+
 # grouping of other controls
 # "product ADT"
 struct ControlGroup <: AbstractControlNode
     id::String
     controls::Vector{AbstractControlNode} # possible child nodes
     filter::Function # determines what nodes are active w.r.t current state
+
+    function ControlGroup(id)
+        return ControlGroup(id, AbstractControlNode[], _alltrue)
+    end
+
 end
 
+function push!(g::ControlGroup, vals...)
+    push!(g.controls, vals...)
+end
+
+
 # materialized as e.g. sliders, number inputs
-struct RealValued{T} <: AbstractControlNode
+struct RealValued{T,R<:AbstractRange{T}} <: AbstractControlNode
     id::String
     controls::Vector{AbstractControlNode}
     filter::Function
 
     cur::Observable{T} # current value
-    min::Observable{T}
-    max::Observable{T}
+    range::R
+
+end
+function RealValued(id, range; value=first(range),
+    controls=AbstractControlNode[], filter=_alltrue)
+    return RealValued(id, controls, filter, value, range)
 end
 
 # e.g. dropdown menu
@@ -39,7 +55,7 @@ struct CategoricalEnumeration{T} <: AbstractControlNode
 end
 
 # e.g. checkbox
-struct Boolean<:AbstractControlNode
+struct Boolean <: AbstractControlNode
     id::String
     filter::Function
     controls::Vector{AbstractControlNode}
