@@ -30,3 +30,16 @@ function dance(state, n=100)
 
     end
 end
+
+
+# modify the application state by reading the client state
+function sync!(state)
+
+    # recompute solution
+    sol = sol_from_controls(state.controls)
+
+    # set the observable state to the new simulation solution
+    state.sol[] = sol
+
+    return nothing
+end
