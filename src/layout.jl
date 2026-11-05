@@ -71,7 +71,16 @@ function Controls(callback::Function)
         on(widget.value) do value
             callback(client_state)
         end
+function slider_value_index(values::AbstractVector, value)
+    isempty(values) && throw(ArgumentError("Slider: `values` must be non-empty"))
+    exact = findfirst((==)(value), values)
+    exact === nothing || return exact
+    if value isa Real && eltype(values) <: Real
+        return argmin(abs.(values .- value))
     end
+    @warn "Slider: value $(value) not in values; defaulting to the first element"
+    return firstindex(values)
+end
 
     return Grid(
         ((
