@@ -3,8 +3,6 @@
 
 """
 
-
-
 """
     DefaultCard(content=DOM.div(); class_name)
 
@@ -88,6 +86,7 @@ end
     Dashboard()
 
 Construct the dashboard DOM.
+makes plots from solution state and ui elements from control state.
 """
 function Dashboard(state::State)
     # The plot that the frontend displays.

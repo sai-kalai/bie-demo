@@ -4,7 +4,6 @@ module DemoWebsite
 
 using Bonito
 using WGLMakie
-using StaticArrays
 
 
 

@@ -18,9 +18,11 @@ function make_app()
     return App() do session, request
         client_state = default_client_state()
 
+        control_tree = default_control_tree()
+
         sol = sol_from_client_state(client_state)
 
-        state = State(sol)
+        state = State(sol, 0., control_tree)
 
         dashboard = Dashboard(state)
         # TODO: compute initial state in this callback so that it's unique to the session
@@ -32,7 +34,35 @@ function make_app()
 end
 
 function default_control_tree()
+    boundary = ControlGroup(
+        "boundary",
+        AbstractControlNode[
+            RealValued("numpoints", 40:10:100; value=40),
+            RealValued("bdryrotation", 0.0:0.1:2π; value=0.0),
+            RealValued("bdrysize", 0.8:0.1:3.0),
+            RealValued("bdryfreq", 2:10; value=5),
+            RealValued("bdryampl", 0.3:0.1:2.0),
+        ],
+    )
 
+    boundary_condition = ControlGroup(
+        "boundary_condition",
+        AbstractControlNode[
+            RealValued("bcampl", -1:1),
+            RealValued("bcalpha", 0.1:0.1:5.0; value=1.0),
+            RealValued("bcomega", -10.0:0.1:10.0),
+            RealValued("bcphase", 0.0:0.1:2π),
+            RealValued("bccenter", 0.0:(π/8):2π; value=π / 2),
+        ],
+    )
+
+    return ControlGroup(
+        "root",
+        AbstractControlNode[
+            boundary,
+            boundary_condition,
+        ],
+    )
 end
 
 
