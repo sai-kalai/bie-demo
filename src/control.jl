@@ -44,5 +44,27 @@ struct Boolean <: AbstractControl
 end
 
 function Base.show(io::IO, c::RealValued)
-    print(io, "RealValued(", c.value[], ", range=", c.range, ")")
+    print(io, "RealValued(", c |> value, ", range=", c.range, ")")
+end
+
+# data validation
+
+# disallow directly accessing the value
+function Base.getproperty(c::AbstractControl, name::Symbol)
+    name === :value && @warn "reading observable directly"
+    return getfield(c, name)
+end
+
+value(c::AbstractControl) = getfield(c, :value)[]
+
+function set_value!(c::RealValued, x)::Bool
+    a, b = extrema(c.range)
+    a <= x <= b || return false
+    getfield(c, :value)[] = x
+    return true
+end
+
+# inplace modification convenience
+function update!(f, c::AbstractControl)
+    set_value!(c, f(value(c)))
 end
