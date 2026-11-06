@@ -1,6 +1,8 @@
 
 # Definition of the tree data structure used for controls
 
+# internal api, should not be used
+
 struct Node{T<:Union{AbstractControl,Nothing},C<:NamedTuple} # consider dict instead
     id::Symbol
     control::T
@@ -16,17 +18,17 @@ function Node(id, control, children::AbstractVector{<:Node})
     Node(Symbol(id), control, children_nt)
 end
 
-getnode(node::Node) = node
-function getnode(node::Node, path::Symbol...)
+_getnode(node::Node) = node
+function _getnode(node::Node, path::Symbol...)
     # @show node.control, path
     isempty(path) && return node
     child = getproperty(node.children, first(path))
-    return getnode(child, Base.tail(path)...)
+    return _getnode(child, Base.tail(path)...)
 end
 
-getcontrol(node::Node, path::Symbol...) = getnode(node, path...).control
+Base.get(node::Node, path::Symbol...) = _getnode(node, path...).control
 
-Base.getindex(node::Node, path::Symbol...) = getnode(node, path...)
+Base.getindex(node::Node, path::Symbol...) = _getnode(node, path...)
 
 function Base.show(io::IO, node::Node)
     print_tree(io, node)

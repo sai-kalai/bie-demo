@@ -126,22 +126,22 @@ end
 
 function problem_from_controls(tree::Node)
 
-    t = get_t(getcontrol(tree, :boundary, :numpoints).value[])
+    t = get_t(get(tree, :boundary, :numpoints).value[])
 
     b = DiscreteClosedCurve(t, (t) -> starfish(
         t;
-        t0=getcontrol(tree, :boundary, :rotation).value[],
-        R=getcontrol(tree, :boundary, :size).value[],
-        a=getcontrol(tree, :boundary, :ampl).value[],
-        w=getcontrol(tree, :boundary, :freq).value[],
+        t0=get(tree, :boundary, :rotation).value[],
+        R=get(tree, :boundary, :size).value[],
+        a=get(tree, :boundary, :ampl).value[],
+        w=get(tree, :boundary, :freq).value[],
     ))
 
     bc_fn = (_t) -> begin
-        A = getcontrol(tree, :bc, :ampl).value[]
-        α = getcontrol(tree, :bc, :alpha).value[]
-        ω = getcontrol(tree, :bc, :omega).value[]
-        ϕ = getcontrol(tree, :bc, :phase).value[]
-        μ = getcontrol(tree, :bc, :center).value[]
+        A = get(tree, :bc, :ampl).value[]
+        α = get(tree, :bc, :alpha).value[]
+        ω = get(tree, :bc, :omega).value[]
+        ϕ = get(tree, :bc, :phase).value[]
+        μ = get(tree, :bc, :center).value[]
 
         return (A / (α * sqrt(2pi))) * exp(-(_t - μ)^2 / (2α^2)) * sin(ω * _t + ϕ)
     end
