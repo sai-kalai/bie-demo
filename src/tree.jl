@@ -27,6 +27,11 @@ function _getnode(node::Node, path::Symbol...)
 end
 
 Base.get(node::Node, path::Symbol...) = _getnode(node, path...).control
+function getchildren(node::Node, path::Symbol...)
+    node = _getnode(node, path...)
+    return (n.control for n in node.children)
+
+end
 
 Base.getindex(node::Node, path::Symbol...) = _getnode(node, path...)
 
