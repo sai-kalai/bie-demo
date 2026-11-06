@@ -16,52 +16,7 @@ function get_t(n)
     range(0, 2π; length=n + 1)[1:(end-1)]
 end
 
-function default_client_state()
-    (;
-        numpoints=(
-            "Number of Boundary Nodes",
-            Bonito.StylableSlider(40:10:100; value=40)
-        ),
-        bdryrotation=(
-            "Rotation (rad)",
-            Bonito.StylableSlider(0:0.1:2pi; value=0)
-        ),
-        bdrysize=(
-            "Diameter",
-            Bonito.StylableSlider(0.8:0.1:3.)
-        ),
-        bdryfreq=(
-            "Number of Tips",
-            Bonito.StylableSlider(2:10; value=5)
-        ),
-        bdryampl=(
-            "Size of Tips",
-            Bonito.StylableSlider(0.3:0.1:2)
-        ),
-        bcampl=(
-            "Amplitude",
-            Bonito.StylableSlider(-1:1)
-        ),
-        bcalpha=(
-            "Spread",
-            Bonito.StylableSlider(0.1:0.1:5; value=1.)
-        ),
-        bcomega=(
-            "Frequency",
-            Bonito.StylableSlider(-10:0.1:10)
-        ),
-        bcphase=(
-            "Phase",
-            Bonito.StylableSlider(0:0.1:2pi)
-        ),
-        bccenter=(
-            "Center",
-            Bonito.StylableSlider(0:(pi/8):2pi; value=4pi / 8)
-        )
-    )
-
-end
-
+# taken from Bonito current version
 function slider_value_index(values::AbstractVector, value)
     isempty(values) && throw(ArgumentError("Slider: `values` must be non-empty"))
     exact = findfirst((==)(value), values)
