@@ -19,7 +19,18 @@ function default_state()
 end
 
 
-STATE=nothing
+# global registry for debugging
+# const SESSIONS = Dict{SessionID, State}()
+
+
+const APP_STATE_KEY = :demowebsite_state
+
+function set_state!(session, state)
+    set_metadata!(session, APP_STATE_KEY, state)
+end
+function get_state(session, default=nothing)
+    get_metadata(session, APP_STATE_KEY)
+end
 
 function make_app()
     # Load the external stylesheet as a Bonito asset.
@@ -31,8 +42,9 @@ function make_app()
 
         state = default_state()
 
-        global STATE
-        STATE = state # for debug
+        set_state!(session, state)
+
+        @info session
 
         dashboard = Dashboard(state)
         # TODO: compute initial state in this callback so that it's unique to the session
