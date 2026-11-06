@@ -22,8 +22,10 @@ end
 function dance(state, n=100)
     for i in 1:n
 
-        for c in state.controls[:bc].children
-            c.control.value[] += 0.01 * randn()
+        for c in getchildren(state.controls[:bc])
+            update!(c) do x
+                x + 0.01 * randn()
+            end
         end
         sync!(state)
         sleep(1 / 60)

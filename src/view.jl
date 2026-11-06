@@ -20,10 +20,10 @@ end
 
 function make_view(::Type{Bonito.StylableSlider}, c::RealValued)
 
-    sldr = Bonito.StylableSlider(c.range; value=c.value[])
+    sldr = Bonito.StylableSlider(c.range; value=c |> value)
 
     # backend => frontend
-    map!(sldr.index, c.value) do v
+    map!(sldr.index, c.value) do v # here it probably is impossible to not give observer...
         # slider index gets updated whenever state changes
         idx = slider_value_index(sldr.values[], v)
         @info "slider set to idx: " idx
@@ -34,7 +34,7 @@ function make_view(::Type{Bonito.StylableSlider}, c::RealValued)
     on(sldr.value) do v
         # TODO: replace this by guarded setter
         @info "control set to: " v
-        c.value[] = v
+        set_value!(c, v)
     end
 
     return sldr

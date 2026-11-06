@@ -24,6 +24,17 @@ struct RealValued{T,R<:AbstractRange{T}} <: AbstractControl
     value::Observable{T} # current value
     range::R # TODO: make observable, some configurations may be invalid after state changes
     info::ControlInfo
+
+    function RealValued(
+        value::Observable{T},
+        range::R,
+        info::ControlInfo
+    ) where {T,R<:AbstractRange{T}}
+
+        is_in_range(value[], range) ||
+            throw(ArgumentError("Initial value outside allowed range"))
+        new{T,R}(value, range, info)
+    end
 end
 function RealValued(range; value=first(range), info=ControlInfo())
     return RealValued(Observable(value), range, info,)
@@ -44,5 +55,32 @@ struct Boolean <: AbstractControl
 end
 
 function Base.show(io::IO, c::RealValued)
-    print(io, "RealValued(", c.value[], ", range=", c.range, ")")
+    print(io, "RealValued(", c |> value, ", range=", c.range, ")")
+end
+
+# data validation
+
+# disallow directly accessing the value
+function Base.getproperty(c::AbstractControl, name::Symbol)
+    name === :value && @warn "reading observable directly"
+    return getfield(c, name)
+end
+
+value(c::AbstractControl) = getfield(c, :value)[]
+
+function set_value!(c::RealValued, x)::Bool
+    is_in_range(x, c.range) || return false
+    @info "value set to: " x
+    getfield(c, :value)[] = x
+    return true
+end
+
+function is_in_range(x, rng)
+    a, b = extrema(rng)
+    a <= x <= b
+end
+
+# inplace modification convenience
+function update!(f, c::AbstractControl)
+    set_value!(c, f(value(c)))
 end
