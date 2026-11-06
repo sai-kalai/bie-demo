@@ -28,8 +28,8 @@ const APP_STATE_KEY = :demowebsite_state
 function set_state!(session, state)
     set_metadata!(session, APP_STATE_KEY, state)
 end
-function get_state(session, default=nothing)
-    get_metadata(session, APP_STATE_KEY)
+function get_state(session)
+    get_metadata(session, APP_STATE_KEY) # crash here if no state
 end
 
 function make_app()
