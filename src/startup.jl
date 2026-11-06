@@ -46,7 +46,7 @@ function make_app()
 
         @info session
 
-        dashboard = Dashboard(state)
+        dashboard = Dashboard(session)
         # TODO: compute initial state in this callback so that it's unique to the session
         DOM.div(
             stylesheet,

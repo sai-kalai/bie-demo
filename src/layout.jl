@@ -28,7 +28,9 @@ function slider_value_index(values::AbstractVector, value)
     return firstindex(values)
 end
 
-function Controls(state)
+function Controls(session::Session)
+
+    state = get_state(session)
 
     return Grid(
         Bonito.Label("Boundary Geometry"),
@@ -79,19 +81,14 @@ function Controls(state)
     )
 end
 
-
-"""
-    Dashboard()
-
-Construct the dashboard DOM.
-makes plots from solution state and ui elements from control state.
-"""
-function Dashboard(state::State)
+function Dashboard(session::Session)
     # The plot that the frontend displays.
+
+    state = get_state(session)
 
     plot = surface_plot(state; figsize=(1300, 760))
 
-    controls = Controls(state)
+    controls = Controls(session)
 
     sidebar = DefaultCard(
         controls;
