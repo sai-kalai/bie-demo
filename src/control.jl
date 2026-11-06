@@ -4,6 +4,10 @@
 # configured at app startup. The view implementations produce valid HTML from
 # the control configuration.
 
+
+# Represents the state of UI. maybe validity doesn't belong here. Composable
+# and flexible tree structure determines schema.
+
 _alltrue(args...) = true
 
 # this couples to display...
