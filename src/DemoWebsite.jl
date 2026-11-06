@@ -16,6 +16,7 @@ include("tree.jl")
 include("control.jl")
 include("compute.jl")
 include("state.jl")
+include("view.jl")
 include("startup.jl")
 include("layout.jl")
 include("figures/surface.jl")
@@ -30,6 +31,7 @@ export start_server, make_app
 
 export main
 
+export make_view
 
 function main()
     app = make_app()

@@ -68,80 +68,27 @@ end
 
 
 
-# TODO: how to make this data compiletime, but allow each session to evolve it?
-function default_control_tree()
-    return Node(:root, nothing, [
-        Node(:boundary, nothing, [
-            Node(:numpoints, RealValued(40:10:100;
-                value=40,
-                info=ControlInfo("Number of Boundary Points", ""))
-            ),
-            Node(:rotation, RealValued(
-                0.0:0.1:2π;
-                value=0.0,
-                info=ControlInfo("Rotation", "")
-            ),
-            ),
-            Node(:size, RealValued(0.8:0.1:3.0;
-                info=ControlInfo("Size", "")),
-            ),
-            Node(:freq, RealValued(1:1:10;
-                value=5,
-                info=ControlInfo("Number of Tips", "")
-            ),
-            ),
-            Node(:ampl, RealValued(0.3:0.1:2.0;
-                info=ControlInfo("Size of Tips", "")
-            ),
-            ),
-        ]),
-        Node(:bc, nothing, [
-            Node(:ampl, RealValued(-1:0.1:1
-                ;
-                info=ControlInfo("Amplitude", "")
-            )),
-            Node(:alpha,
-                RealValued(0.1:0.1:5.0;
-                    value=1.0,
-                    info=ControlInfo("Spread", "")
-                )
-            ),
-            Node(:omega, RealValued(-10.0:0.1:10.0;
-                info=ControlInfo("Frequency", ""),
-            )),
-            Node(:phase, RealValued(0.0:0.1:2π;
-                info=ControlInfo("Phase", "")
-            )
-            ),
-            Node(:center, RealValued(0.0:0.1:2π;
-                value=0.,
-                info=ControlInfo("Location", "")
-            ),
-            ),
-        ],)
-    ])
-end
 
 # TODO: config struct with fixed schema for a specific application
 
 function problem_from_controls(tree::Node)
 
-    t = get_t(getcontrol(tree, :boundary, :numpoints).state[])
+    t = get_t(get(tree, :boundary, :numpoints).value[])
 
     b = DiscreteClosedCurve(t, (t) -> starfish(
         t;
-        t0=getcontrol(tree, :boundary, :rotation).state[],
-        R=getcontrol(tree, :boundary, :size).state[],
-        a=getcontrol(tree, :boundary, :ampl).state[],
-        w=getcontrol(tree, :boundary, :freq).state[],
+        t0=get(tree, :boundary, :rotation).value[],
+        R=get(tree, :boundary, :size).value[],
+        a=get(tree, :boundary, :ampl).value[],
+        w=get(tree, :boundary, :freq).value[],
     ))
 
     bc_fn = (_t) -> begin
-        A = getcontrol(tree, :bc, :ampl).state[]
-        α = getcontrol(tree, :bc, :alpha).state[]
-        ω = getcontrol(tree, :bc, :omega).state[]
-        ϕ = getcontrol(tree, :bc, :phase).state[]
-        μ = getcontrol(tree, :bc, :center).state[]
+        A = get(tree, :bc, :ampl).value[]
+        α = get(tree, :bc, :alpha).value[]
+        ω = get(tree, :bc, :omega).value[]
+        ϕ = get(tree, :bc, :phase).value[]
+        μ = get(tree, :bc, :center).value[]
 
         return (A / (α * sqrt(2pi))) * exp(-(_t - μ)^2 / (2α^2)) * sin(ω * _t + ϕ)
     end

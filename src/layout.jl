@@ -16,17 +16,6 @@ function get_t(n)
     range(0, 2π; length=n + 1)[1:(end-1)]
 end
 
-# taken from Bonito current version
-function slider_value_index(values::AbstractVector, value)
-    isempty(values) && throw(ArgumentError("Slider: `values` must be non-empty"))
-    exact = findfirst((==)(value), values)
-    exact === nothing || return exact
-    if value isa Real && eltype(values) <: Real
-        return argmin(abs.(values .- value))
-    end
-    @warn "Slider: value $(value) not in values; defaulting to the first element"
-    return firstindex(values)
-end
 
 function Controls(session::Session)
 
@@ -34,46 +23,9 @@ function Controls(session::Session)
 
     return Grid(
         Bonito.Label("Boundary Geometry"),
-        map(state.controls[:boundary].children) do node
-            sldr = Bonito.StylableSlider(node.control.range; value=node.control.state[])
-
-            map!(sldr.index, node.control.state) do v
-                # slider index gets updated whenever state changes
-                slider_value_index(sldr.values[], v)
-            end
-
-            on(sldr.value) do v
-                node.control.state[] = v
-                sync!(state)
-            end
-
-
-            return (
-                Bonito.Label(node.control.info.label),
-                sldr,
-                Bonito.Label(node.control.state)
-            )
-        end...,
+        map(make_view, getchildren(state.controls, :boundary))...,
         Bonito.Label("Boundary Conditions"),
-        map(state.controls[:bc].children) do node
-            sldr = Bonito.StylableSlider(node.control.range; value=node.control.state[])
-
-            map!(sldr.index, node.control.state) do v
-                # slider index gets updated whenever state changes
-                slider_value_index(sldr.values[], v)
-            end
-
-            # todo: is it possible to have the same observable and not have to define listeners?
-            on(sldr.value) do v
-                node.control.state[] = v
-                sync!(state)
-            end
-            return (
-                Bonito.Label(node.control.info.label),
-                sldr,
-                Bonito.Label(node.control.state)
-            )
-        end...,
+        map(make_view, getchildren(state.controls, :bc))...,
         ;
         justify_content="begin",
         align_items="begin",
