@@ -33,7 +33,7 @@ struct CategoricalEnumeration{T} <: AbstractControl
 end
 
 # e.g. checkbox
-struct Boolean{C<:NamedTuple} <: AbstractControl
+struct Boolean <: AbstractControl
     state::Observable{Bool}
     info::ControlInfo
 end
