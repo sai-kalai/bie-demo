@@ -19,7 +19,18 @@ function default_state()
 end
 
 
-STATE=nothing
+# global registry for debugging
+# const SESSIONS = Dict{SessionID, State}()
+
+
+const APP_STATE_KEY = :demowebsite_state
+
+function set_state!(session, state)
+    set_metadata!(session, APP_STATE_KEY, state)
+end
+function get_state(session)
+    get_metadata(session, APP_STATE_KEY) # crash here if no state
+end
 
 function make_app()
     # Load the external stylesheet as a Bonito asset.
@@ -31,10 +42,11 @@ function make_app()
 
         state = default_state()
 
-        global STATE
-        STATE = state # for debug
+        set_state!(session, state)
 
-        dashboard = Dashboard(state)
+        @info session
+
+        dashboard = Dashboard(session)
         # TODO: compute initial state in this callback so that it's unique to the session
         DOM.div(
             stylesheet,
@@ -42,6 +54,19 @@ function make_app()
         )
     end
 end
+
+function list_sessions(server::Server=Bonito.get_server())
+    lock(server.websocket_routes.lock) do
+        [
+            conn.session
+            for (_, conn) in server.websocket_routes.table
+            if conn isa Bonito.WebSocketConnection &&
+                !isnothing(conn.session)
+        ]
+    end
+end
+
+
 
 # TODO: how to make this data compiletime, but allow each session to evolve it?
 function default_control_tree()
