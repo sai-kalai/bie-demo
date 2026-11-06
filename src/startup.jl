@@ -61,7 +61,7 @@ function list_sessions(server::Server=Bonito.get_server())
             conn.session
             for (_, conn) in server.websocket_routes.table
             if conn isa Bonito.WebSocketConnection &&
-               !isnothing(conn.session)
+                !isnothing(conn.session)
         ]
     end
 end
