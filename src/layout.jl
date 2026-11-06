@@ -35,15 +35,15 @@ function Controls(session::Session)
     return Grid(
         Bonito.Label("Boundary Geometry"),
         map(state.controls[:boundary].children) do node
-            sldr = Bonito.StylableSlider(node.control.range; value=node.control.state[])
+            sldr = Bonito.StylableSlider(node.control.range; value=node.control.value[])
 
-            map!(sldr.index, node.control.state) do v
+            map!(sldr.index, node.control.value) do v
                 # slider index gets updated whenever state changes
                 slider_value_index(sldr.values[], v)
             end
 
             on(sldr.value) do v
-                node.control.state[] = v
+                node.control.value[] = v
                 sync!(state)
             end
 
@@ -51,27 +51,27 @@ function Controls(session::Session)
             return (
                 Bonito.Label(node.control.info.label),
                 sldr,
-                Bonito.Label(node.control.state)
+                Bonito.Label(node.control.value)
             )
         end...,
         Bonito.Label("Boundary Conditions"),
         map(state.controls[:bc].children) do node
-            sldr = Bonito.StylableSlider(node.control.range; value=node.control.state[])
+            sldr = Bonito.StylableSlider(node.control.range; value=node.control.value[])
 
-            map!(sldr.index, node.control.state) do v
+            map!(sldr.index, node.control.value) do v
                 # slider index gets updated whenever state changes
                 slider_value_index(sldr.values[], v)
             end
 
             # todo: is it possible to have the same observable and not have to define listeners?
             on(sldr.value) do v
-                node.control.state[] = v
+                node.control.value[] = v
                 sync!(state)
             end
             return (
                 Bonito.Label(node.control.info.label),
                 sldr,
-                Bonito.Label(node.control.state)
+                Bonito.Label(node.control.value)
             )
         end...,
         ;
