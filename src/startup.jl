@@ -43,6 +43,19 @@ function make_app()
     end
 end
 
+function list_sessions(server::Server=Bonito.get_server())
+    lock(server.websocket_routes.lock) do
+        [
+            conn.session
+            for (_, conn) in server.websocket_routes.table
+            if conn isa Bonito.WebSocketConnection &&
+               !isnothing(conn.session)
+        ]
+    end
+end
+
+
+
 # TODO: how to make this data compiletime, but allow each session to evolve it?
 function default_control_tree()
     return Node(:root, nothing, [
