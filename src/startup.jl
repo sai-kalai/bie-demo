@@ -10,11 +10,11 @@ function start_server(app)
 end
 
 function default_state()
-    control_tree = default_control_tree()
+    controls = Model.ControlState()
 
-    sol = sol_from_controls(control_tree)
+    sol = sol_from_controls(controls)
 
-    state = State(Observable(sol), Observable(0.), control_tree)
+    state = State(Observable(sol), Observable(0.), controls)
     return state
 end
 
@@ -73,22 +73,22 @@ end
 
 function problem_from_controls(tree::Node)
 
-    t = get(tree, :boundary, :numpoints) |> value |> get_t
+    t = get(tree, :boundary, :numpoints) |> Model.value |> get_t
 
     b = DiscreteClosedCurve(t, (t) -> starfish(
         t;
-        t0=get(tree, :boundary, :rotation) |> value,
-        R=get(tree, :boundary, :size) |> value,
-        a=get(tree, :boundary, :ampl) |> value,
-        w=get(tree, :boundary, :freq) |> value,
+        t0=get(tree, :boundary, :rotation) |> oldvalue,
+        R=get(tree, :boundary, :size) |> oldvalue,
+        a=get(tree, :boundary, :ampl) |> oldvalue,
+        w=get(tree, :boundary, :freq) |> oldvalue,
     ))
 
     bc_fn = (_t) -> begin
-        A = get(tree, :bc, :ampl) |> value # maybe getvalue?
-        α = get(tree, :bc, :alpha) |> value
-        ω = get(tree, :bc, :omega) |> value
-        ϕ = get(tree, :bc, :phase) |> value
-        μ = get(tree, :bc, :center) |> value
+        A = get(tree, :bc, :ampl) |> oldvalue # maybe getvalue?
+        α = get(tree, :bc, :alpha) |> oldvalue
+        ω = get(tree, :bc, :omega) |> oldvalue
+        ϕ = get(tree, :bc, :phase) |> oldvalue
+        μ = get(tree, :bc, :center) |> oldvalue
 
         return (A / (α * sqrt(2pi))) * exp(-(_t - μ)^2 / (2α^2)) * sin(ω * _t + ϕ)
     end
@@ -96,6 +96,34 @@ function problem_from_controls(tree::Node)
     bc = Dirichlet(
         bc_fn.(t)
     )
+
+    pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
+    return pb
+end
+
+function problem_from_controls(controls::ControlState)
+
+    t = controls.numpoints |> value |> get_t
+
+    b = DiscreteClosedCurve(t, (t) -> (controls.boundaryshape |> value)(t))
+
+    # bc_fn = (_t) -> begin
+    #     A = 1.
+    #     α = 1.
+    #     ω = 1.
+    #     ϕ = 0.
+    #     μ = pi
+    #
+    #     return (A / (α * sqrt(2pi))) * exp(-(_t - μ)^2 / (2α^2)) * sin(ω * _t + ϕ)
+    # end
+
+    bc_fn = controls.bcshape |> value
+
+    bc = Dirichlet(
+        bc_fn.(t)
+    )
+
+    @info bc
 
     pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
     return pb

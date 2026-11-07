@@ -9,6 +9,8 @@ function simulate(pb; n_grid=50)
     x_test = stack((x, y) for y in ys for x in xs)
     # x_test = Fixtures.test_locations()
 
+    @info pb
+
     sol = solve(
         pb,
         IndirectBVPAlgorithm(evalmethod=CauchyIntegral()),

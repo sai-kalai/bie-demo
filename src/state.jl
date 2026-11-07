@@ -4,12 +4,13 @@ and also the controllable parameters
 
 """
 
-struct State{S,T,N}
-    sol::Observable{S} # solution to a bvp, contains full information
+struct State{S,T,C}
+    sol::Observable{S} # solution to a bvp, contains full information about
+    # computed boundary shape, conditions, results
     t::Observable{T} # current time being visualized
 
     # tree of controllable options
-    controls::N
+    controls::C # contains state of user driven choices
 end
 
 

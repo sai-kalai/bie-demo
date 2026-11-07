@@ -16,22 +16,35 @@ function get_t(n)
     range(0, 2π; length=n + 1)[1:(end-1)]
 end
 
+function Controls(state::State)
+
+    controls = state.controls
+
+    return make_view(controls)
+
+    # Grid(
+    # Bonito.Label("Boundary Geometry"),
+    #
+    #
+    # )
+    #
+    #     return Grid(
+    #         Bonito.Label("Boundary Geometry"),
+    #         map(make_view, getchildren(state.controls, :boundary))...,
+    #         Bonito.Label("Boundary Conditions"),
+    #         map(make_view, getchildren(state.controls, :bc))...,
+    #     ;
+    #     justify_content="begin",
+    #     align_items="begin",
+    #     class="dashboard-controls",
+    # )
+end
 
 function Controls(session::Session)
-
     state = get_state(session)
-
-    return Grid(
-        Bonito.Label("Boundary Geometry"),
-        map(make_view, getchildren(state.controls, :boundary))...,
-        Bonito.Label("Boundary Conditions"),
-        map(make_view, getchildren(state.controls, :bc))...,
-        ;
-        justify_content="begin",
-        align_items="begin",
-        class="dashboard-controls",
-    )
+    return Controls(state)
 end
+
 
 function Dashboard(session::Session)
     # The plot that the frontend displays.

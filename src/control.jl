@@ -1,4 +1,7 @@
-# representation fo the contol structure
+# representation fo the UI state and constraints
+# validation at this layer prevents invalid visualization states
+#
+# actually, this is the view!
 
 # The data model for controls specifies the validity of values and can be
 # configured at app startup. The view implementations produce valid HTML from
@@ -55,7 +58,7 @@ struct Boolean <: AbstractControl
 end
 
 function Base.show(io::IO, c::RealValued)
-    print(io, "RealValued(", c |> value, ", range=", c.range, ")")
+    print(io, "RealValued(", c |> oldvalue, ", range=", c.range, ")")
 end
 
 # data validation
@@ -66,7 +69,7 @@ function Base.getproperty(c::AbstractControl, name::Symbol)
     return getfield(c, name)
 end
 
-value(c::AbstractControl) = getfield(c, :value)[]
+oldvalue(c::AbstractControl) = getfield(c, :value)[]
 
 function set_value!(c::RealValued, x)::Bool
     is_in_range(x, c.range) || return false
@@ -82,5 +85,91 @@ end
 
 # inplace modification convenience
 function update!(f, c::AbstractControl)
-    set_value!(c, f(value(c)))
+    set_value!(c, f(oldvalue(c)))
 end
+
+
+function make_config(controls::Node)
+
+end
+
+
+# function make_controls(config::SimulationConfig)
+#     boundary = make_controls(config.boundary)
+#     bc = make_controls(config.bc)
+#
+#     numpoints = Node(:numpoints, RealValued(40:10:100;
+#         value=40,
+#         info=ControlInfo("Number of Boundary Points", ""))
+#     )
+#
+#     return Node(:root, nothing, [
+#         Node(:boundary, nothing, [
+#             boundary..., numpoints
+#         ]),
+#         Node(:bc, nothing, bc)])
+#
+# end
+#
+# function make_controls(config::Starfish)
+#     return [
+#         Node(:rotation, RealValued(
+#             0.0:0.1:2π;
+#             value=config.t0,
+#             info=ControlInfo("Rotation", "")
+#         ),
+#         ),
+#         Node(:size, RealValued(0.8:0.1:3.0;
+#             value=config.R,
+#             info=ControlInfo("Size", "")),
+#         ),
+#         Node(:freq, RealValued(1:1:10;
+#             value=config.w,
+#             info=ControlInfo("Number of Tips", "")
+#         ),
+#         ),
+#         Node(:ampl, RealValued(0.3:0.1:2.0;
+#             value=config.a,
+#             info=ControlInfo("Size of Tips", "")
+#         ),
+#         ),]
+#
+#
+# end
+#
+# function make_controls(config::Circle)
+#     return [
+#         Node(:size, RealValued(0.8:0.1:3.0;
+#             value=config.R,
+#             info=ControlInfo("Size", "")),
+#         ),
+#     ]
+# end
+#
+# # TODO: this is better with convert
+#
+# function make_controls(b::Bump)
+#     return [
+#         Node(:amplitude, RealValued(0.0:0.01:10.0; value=b.A)),
+#         Node(:width, RealValued(0.01:0.01:5.0; value=b.α)),
+#         Node(:center, RealValued(-π:0.01:π; value=b.μ)),
+#     ]
+# end
+#
+# function make_controls(b::Sine)
+#     return [
+#         Node(:amplitude, RealValued(0.0:0.01:10.0; value=b.A)),
+#         Node(:frequency, RealValued(0.1:0.1:20.0; value=b.ω)),
+#         Node(:phase, RealValued(-π:0.01:π; value=b.ϕ)),
+#     ]
+# end
+#
+# function make_controls(b::WavePacket)
+#     return [
+#         Node(:amplitude, RealValued(0.0:0.01:10.0; value=b.A)),
+#         Node(:width, RealValued(0.01:0.01:5.0; value=b.α)),
+#         Node(:frequency, RealValued(0.1:0.1:20.0; value=b.ω)),
+#         Node(:phase, RealValued(-π:0.01:π; value=b.ϕ)),
+#         Node(:center, RealValued(-π:0.01:π; value=b.μ)),
+#     ]
+# end

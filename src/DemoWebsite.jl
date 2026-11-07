@@ -12,6 +12,9 @@ using BoundaryIntegralPDE.DevTools
 
 abstract type AbstractControl end
 
+include("model/Model.jl")
+using .Model
+
 include("tree.jl")
 include("control.jl")
 include("compute.jl")
@@ -22,6 +25,7 @@ include("layout.jl")
 include("figures/surface.jl")
 
 
+export Model
 
 export DefaultCard, Controls, Dashboard, make_app
 
