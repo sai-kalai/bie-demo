@@ -69,8 +69,8 @@ function make_view(x::Choice)
     end
 
     # The selected variant determines which controls are displayed.
-    variant_view = map(x._value) do key
-        make_view(x._choices[key])
+    variant_view = map(observable(x)) do _
+        make_view(value(x))
     end
 
     return Bonito.DOM.div(
