@@ -28,15 +28,19 @@ function Controls(session::Session)
     return Controls(state)
 end
 
-
 function Dashboard(session::Session)
+    state = get_state(session)
+    Dashboard(state)
+end
+
+function Dashboard(state::State)
     # The plot that the frontend displays.
 
-    state = get_state(session)
 
     plot = surface_plot(state; figsize=(1300, 760))
 
-    controls = Controls(session)
+    controls = Controls(state)
+
 
     sidebar = DefaultCard(
         controls;
