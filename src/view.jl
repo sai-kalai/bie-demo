@@ -19,41 +19,37 @@ function make_view(c::ControlState)
 end
 
 
-function make_view(x::RealInRange)
+# TODO: if the max/min properties are updated, that is also observed
+function make_view(x::RealInRange; step=nothing, length=nothing, format=nothing)
+    if isnothing(format)
+        format = string
+    end
 
     slider = Bonito.StylableSlider(
-        range(x |> minimum, x |> maximum; length=10);
-        # value=x |> value,
+        range(x |> minimum, x |> maximum; step=step, length=length),
     )
 
     # Browser -> Julia
     on(slider.value) do v
         setvalue!(x, v)
-        # state[] == v || (state[] = v)
     end
 
-    # Julia -> Browser
-    on(observable(x)) do v
-        slider.value[] == v || (slider.value[] = v)
+    slider[] = value(x)
+
+    # getindex assign works
+    on(observable(x);) do _
+        slider[] = value(x)
     end
 
-    # backend => frontend
-    map!(slider.index, observable(x)) do v # here it probably is impossible to not give observer...
-        # slider index gets updated whenever state changes
-        idx = slider_value_index(slider.values[], v)
-        @info "slider set to idx: " idx
-        idx
-    end
-
-    return slider
+    # probably better to label with slider value instead of source of truth to
+    # avoid one ws message.
+    # also, displaying client side value remains functional if connection is lost
+    return Bonito.Labeled(slider, map(format, slider.value)) # value is also an observable
 end
 
 function make_view(x::Choice)
 
-
     names = choices(x) |> collect
-
-    @show chosen(x), names
 
     dropdown = Bonito.Dropdown(
         names;
@@ -63,6 +59,7 @@ function make_view(x::Choice)
 
     # Browser -> Julia
     on(dropdown.value) do key
+        # equal check may be redundant if put in model but might be better to save network cost
         chosen(x) == key || setchosen!(x, key)
     end
 
