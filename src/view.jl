@@ -84,10 +84,9 @@ function make_view(x::Choice)
     )
 end
 
-function make_view(x::Union{Model.BCShape,Model.BoundaryShape})
 
-    return Grid(
-        map(make_view, observable(x))
+floatformat(v) = @sprintf("%.2f", v)
+intformat(v) = @sprintf("%d", v)
     )
 
 end
