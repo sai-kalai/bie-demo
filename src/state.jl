@@ -1,10 +1,8 @@
 """
 Representation of the application state: the problem, solution, and algorithm
 and also the controllable parameters
-"""
 
-#NOTE: Takeaway: a clear distinction on the two sides of state is needed,
-#possibly exposed through individual services: "controls", "simulation", "scheduling"
+"""
 
 struct State{S,T,C}
     sol::Observable{S} # solution to a bvp, contains full information about
@@ -24,12 +22,12 @@ end
 # just for fun
 function dance(state, n=100)
     for i in 1:n
-        # TODO update
-        # for c in getchildren(state.controls[:bc])
-        #     update!(c) do x
-        #         x + 0.01 * randn()
-        #     end
-        # end
+
+        for c in getchildren(state.controls[:bc])
+            update!(c) do x
+                x + 0.01 * randn()
+            end
+        end
         sync!(state)
         sleep(1 / 60)
 
@@ -42,7 +40,6 @@ function sync!(state)
 
     # recompute solution
     sol = sol_from_controls(state.controls)
-
 
     # set the observable state to the new simulation solution
     state.sol[] = sol

@@ -16,10 +16,10 @@ function Bump()
         RealInRange(pi, 0, 2pi),
     )
 end
-function (b::Bump)(t::Real)
+function (b::Bump)(t)
     return bump(
         t;
-        tonamedtuple(b)...)
+        value(b)...)
 end
 function bump(t; A, α, μ)
     (A / (α * sqrt(2pi))) * exp(-(t - μ)^2 / (2α^2))
@@ -36,8 +36,8 @@ function Sinusoidal()
         RealInRange(-10., 10.),
         RealInRange(0., 2pi),)
 end
-function (b::Sinusoidal)(t::Real)
-    return sinusoidal(t; tonamedtuple(b)...)
+function (b::Sinusoidal)(t)
+    return sinusoidal(t; value(b)...)
 end
 function sinusoidal(
     t; A, ω, ϕ
@@ -67,17 +67,11 @@ function WavePacket()
     )
 end
 
-#NOTE: Takeaway: i really don't like constructing sin and bump again
-#Also, constructing these types should be possible in "half observable" way and
-#the observables should be usable in arithmetic. maybe just using the snapshot version is fine: snapshot before arithmetic so all fields are converted to current value
-#Also, validation at snapshot time could be useful but also live updating of values, e.g. when the sise of a starship is too low, reduce the maximum tip size so no spurious or self intersecting curves occur
-#and the thumbs in html move automatically
-function (b::WavePacket)(t::Real)
-    # TODO: another problem: this constructor doesn't work
-    sine = Sinusoidal(RealInRange(1.), b.ω, b.ϕ)
-    bmp = Bump(RealInRange(1.), b.α, b.μ)
-    # TODO: also awkward value call here...
-    return value(b.A) * bmp(t) * sine(t)
+# i really don't like constructing sin and bump again
+function (b::WavePacket)(t)
+    sine = Sinusoidal(1., b.ω, b.ϕ)
+    bump = Bump(1., b.α, b.μ)
+    return b.A * bump(t) * sine(t)
 
 end
 
