@@ -87,13 +87,63 @@ end
 
 floatformat(v) = @sprintf("%.2f", v)
 intformat(v) = @sprintf("%d", v)
-    )
 
+# NOTE: this seems tedious to define individually, but may be the correct choice
+# TODO: find a better abstraction for defining formatting
+function make_view(x::Model.Starfish)
+    return Bonito.DOM.div(
+        Bonito.Label("Size"),
+        make_view(x.R; length=100, format=floatformat),
+        Bonito.Label("Rotation"),
+        make_view(x.t0; length=100, format=floatformat), # make default be inferred from dtype of RealInRange
+        Bonito.Label("Number of Tips"),
+        make_view(x.w; step=1, format=intformat),
+        Bonito.Label("Size of Tips"),
+        make_view(x.a; length=100, format=floatformat),
+    )
 end
 
-# function make_view(Type{Bonito.NumberInput}, ::RealValued)
-#
-# end
+function make_view(x::Model.Circle)
+    return Bonito.DOM.div(
+        Bonito.Label("Size"),
+        make_view(x.R; length=100, format=floatformat),
+    )
+end
 
+function make_view(x::Model.Bump)
+    return Bonito.DOM.div(
+        Bonito.Label("Amplitude"),
+        make_view(x.A; length=100, format=floatformat),
+        Bonito.Label("Spread"),
+        make_view(x.α; length=100, format=floatformat),
+        Bonito.Label("Center"),
+        make_view(x.μ; length=100, format=floatformat),
+    )
+end
 
+function make_view(x::Model.Sinusoidal)
+    return Bonito.DOM.div(
+        Bonito.Label("Amplitude"),
+        make_view(x.A; length=100, format=floatformat),
+        Bonito.Label("Frequency"),
+        make_view(x.ω; length=100, format=floatformat),
+        Bonito.Label("Phase"),
+        make_view(x.ϕ; length=100, format=floatformat),
+    )
+end
+
+function make_view(x::Model.WavePacket)
+    return Bonito.DOM.div(
+        Bonito.Label("Amplitude"),
+        make_view(x.A; length=100, format=floatformat),
+        Bonito.Label("Spread"),
+        make_view(x.α; length=100, format=floatformat),
+        Bonito.Label("Center"),
+        make_view(x.μ; length=100, format=floatformat),
+        Bonito.Label("Frequency"),
+        make_view(x.ω; length=100, format=floatformat),
+        Bonito.Label("Phase"),
+        make_view(x.ϕ; length=100, format=floatformat),
+    )
+end
 
