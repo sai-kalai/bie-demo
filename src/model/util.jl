@@ -50,14 +50,14 @@ Base.maximum(x::RealInRange) = x._max[]
 
 # Setters
 function setvalue!(x::RealInRange{T}, v::Real) where T
+    @info "setting $x value to $v"
     v = convert(T, v)
-
     isinrange(v, minimum(x), maximum(x)) ||
         throw(ArgumentError("Value outside allowed range"))
-
     x._value[] = v
     return v
 end
+# TODO: experiment with setindex!
 
 function setminimum!(x::RealInRange{T}, v::Real) where T
     v = convert(T, v)
