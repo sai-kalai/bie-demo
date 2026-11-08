@@ -124,7 +124,7 @@ function Choice(::Type{A}) where A
     return Choice{A}(Observable(choices |> keys |> first), choices)
 end
 
-# getters
+# getters #TODO: i dont like thee naming
 chosen(x::Choice)::Symbol = x._value[]
 function value(x::Choice{A})::A where A
     x._choices[chosen(x)]
