@@ -131,6 +131,7 @@ function value(x::Choice{A})::A where A
 end
 # TODO: return type?
 choices(x::Choice) = keys(x._choices)
+values(x::Choice) = values(x._choices)
 
 function setchosen!(x::Choice, key::Symbol)
     haskey(x._choices, key) ||
