@@ -10,7 +10,7 @@ function start_server(app)
 end
 
 function default_state()
-    controls = Model.ControlState()
+    controls = Model.ControlState()::Model.ControlState
 
     sol = sol_from_controls(controls)
 

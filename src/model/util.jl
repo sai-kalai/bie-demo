@@ -16,8 +16,8 @@ struct RealInRange{T<:Real}
         max::Observable{T}
     ) where T
 
-        min[] < max[] ||
-            throw(ArgumentError("Minimum must be less than maximum"))
+        min[] <= max[] ||
+            throw(ArgumentError("Minimum must be less than or equal to maximum"))
 
         min[] <= value[] <= max[] ||
             throw(ArgumentError("Value must be within range"))
