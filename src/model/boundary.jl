@@ -4,6 +4,10 @@ abstract type BoundaryShape end
 
 # needs to be callable on a list of parameter values...
 
+# NOTE: Takeaway: here, this should be parametric so that a concrete, fixed floating point
+# representation can be used. This way, the same schema defined for the control
+# model can produce a valid snapshot with the observable current values at the
+# moment of the screenshot
 struct Starfish{T} <: BoundaryShape
     t0::RealInRange{T}
     R::RealInRange{T}
@@ -19,6 +23,22 @@ function Starfish()
     )
 end
 
+# NOTE: Takeaway: api for setting bounds of realinrange clamps the value
+# is there a way to listen for changes in any of the members? should RealInRange
+# itself be in an observable
+# convert struct to named tuple for kwarg splatting
+# effectively "snapshot"
+# This is i think the main friction with the new, heterogeneous, static schema
+function tonamedtuple(x::Union{BCShape,BoundaryShape})
+    names = fieldnames(typeof(x))
+    values = (value(getfield(x, name)) for name in names)
+    return NamedTuple{names}(values)
+end
+function toobservables(x::Union{BCShape,BoundaryShape})
+    names = fieldnames(typeof(x))
+    values = (observable(getfield(x, name)) for name in names)
+    return NamedTuple{names}(values)
+end
 function (b::Starfish)(t::Number)
     return BoundaryIntegralPDE.starfish(
         t;
@@ -26,7 +46,7 @@ function (b::Starfish)(t::Number)
         # model state. probably validation from the model itself is enough to trust
         # throwing data into simulation, but who knows.
         # Also field names of struct have to coincide with starfish callable which is weird.
-        value(b)...
+        tonamedtuple(b)...
 
         # t0=b.t0, R=b.R, a=b.a, w=b.w
 

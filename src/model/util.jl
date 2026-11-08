@@ -3,19 +3,17 @@
 # setters perform validation before altering observable state
 # value must be within accepted set of values
 
-
-
-# convert struct to named tuple for kwarg splatting
-function value(x::Union{BCShape,BoundaryShape})
-    names = fieldnames(typeof(x))
-    values = (value(getfield(x, name)) for name in names)
-    return NamedTuple{names}(values)
-end
-function observable(x::Union{BCShape,BoundaryShape})
-    names = fieldnames(typeof(x))
-    values = (getfield(x, name) for name in names)
-    return NamedTuple{names}(values)
-end
+# # convert struct to named tuple for kwarg splatting
+# function value(x::Union{BCShape,BoundaryShape})
+#     names = fieldnames(typeof(x))
+#     values = (value(getfield(x, name)) for name in names)
+#     return NamedTuple{names}(values)
+# end
+# function observable(x::Union{BCShape,BoundaryShape})
+#     names = fieldnames(typeof(x))
+#     values = (getfield(x, name) for name in names)
+#     return NamedTuple{names}(values)
+# end
 
 # definition of a real-valued state that must remain in a range
 struct RealInRange{T<:Real}

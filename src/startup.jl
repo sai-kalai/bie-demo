@@ -46,6 +46,24 @@ function make_app()
 
         @info session
 
+        ctr = state.controls
+
+        # NOTE: Takeaway
+        # this code sucks, need to define a structured way to collect observables
+        os = (
+            ctr.numpoints |> observable,
+            ctr.boundaryshape |> observable,
+            (ctr.boundaryshape._choices |> values |> collect .|> Model.toobservables |> Iterators.flatten |> collect)...,
+            ctr.bcshape |> observable,
+            (ctr.bcshape._choices |> values |> collect .|> Model.toobservables |> Iterators.flatten |> collect)...,
+        )
+
+        @info os
+
+        onany(os...) do args...
+            sync!(state)
+        end
+
         dashboard = Dashboard(session)
         # TODO: compute initial state in this callback so that it's unique to the session
         DOM.div(
@@ -66,40 +84,38 @@ function list_sessions(server::Server=Bonito.get_server())
     end
 end
 
-
-
-
 # TODO: config struct with fixed schema for a specific application
 
-function problem_from_controls(tree::Node)
-
-    t = get(tree, :boundary, :numpoints) |> Model.value |> get_t
-
-    b = DiscreteClosedCurve(t, (t) -> starfish(
-        t;
-        t0=get(tree, :boundary, :rotation) |> oldvalue,
-        R=get(tree, :boundary, :size) |> oldvalue,
-        a=get(tree, :boundary, :ampl) |> oldvalue,
-        w=get(tree, :boundary, :freq) |> oldvalue,
-    ))
-
-    bc_fn = (_t) -> begin
-        A = get(tree, :bc, :ampl) |> oldvalue # maybe getvalue?
-        α = get(tree, :bc, :alpha) |> oldvalue
-        ω = get(tree, :bc, :omega) |> oldvalue
-        ϕ = get(tree, :bc, :phase) |> oldvalue
-        μ = get(tree, :bc, :center) |> oldvalue
-
-        return (A / (α * sqrt(2pi))) * exp(-(_t - μ)^2 / (2α^2)) * sin(ω * _t + ϕ)
-    end
-
-    bc = Dirichlet(
-        bc_fn.(t)
-    )
-
-    pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
-    return pb
-end
+#NOTE: Takeaway: tree is too flexible
+# function problem_from_controls(tree::Node)
+#
+#     t = get(tree, :boundary, :numpoints) |> Model.value |> get_t
+#
+#     b = DiscreteClosedCurve(t, (t) -> starfish(
+#         t;
+#         t0=get(tree, :boundary, :rotation) |> oldvalue,
+#         R=get(tree, :boundary, :size) |> oldvalue,
+#         a=get(tree, :boundary, :ampl) |> oldvalue,
+#         w=get(tree, :boundary, :freq) |> oldvalue,
+#     ))
+#
+#     bc_fn = (_t) -> begin
+#         A = get(tree, :bc, :ampl) |> oldvalue # maybe getvalue?
+#         α = get(tree, :bc, :alpha) |> oldvalue
+#         ω = get(tree, :bc, :omega) |> oldvalue
+#         ϕ = get(tree, :bc, :phase) |> oldvalue
+#         μ = get(tree, :bc, :center) |> oldvalue
+#
+#         return (A / (α * sqrt(2pi))) * exp(-(_t - μ)^2 / (2α^2)) * sin(ω * _t + ϕ)
+#     end
+#
+#     bc = Dirichlet(
+#         bc_fn.(t)
+#     )
+#
+#     pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
+#     return pb
+# end
 
 function problem_from_controls(controls::ControlState)
 
@@ -107,17 +123,10 @@ function problem_from_controls(controls::ControlState)
 
     b = DiscreteClosedCurve(t, (t) -> (controls.boundaryshape |> value)(t))
 
-    # bc_fn = (_t) -> begin
-    #     A = 1.
-    #     α = 1.
-    #     ω = 1.
-    #     ϕ = 0.
-    #     μ = pi
-    #
-    #     return (A / (α * sqrt(2pi))) * exp(-(_t - μ)^2 / (2α^2)) * sin(ω * _t + ϕ)
-    # end
-
+    # don't like calling value here, need "snapshot" that has the same shape as the
+    # state struct but where the fields are a concrete numeric type, not RealInRange
     bc_fn = controls.bcshape |> value
+
 
     bc = Dirichlet(
         bc_fn.(t)

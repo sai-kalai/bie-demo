@@ -8,8 +8,9 @@ using Observables
 using BoundaryIntegralPDE
 
 export ControlState, value, setvalue!, chosen, setchosen!, choices
-export Choice, RealInRange
+export Choice, RealInRange, Switch
 export observable, observable_max, observable_min
+export tonamedtuple
 
 include("util.jl")
 include("boundary.jl")
