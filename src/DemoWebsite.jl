@@ -6,11 +6,10 @@ using Bonito
 using WGLMakie
 
 
-
 using BoundaryIntegralPDE
 using BoundaryIntegralPDE.DevTools
 
-abstract type AbstractControl end
+# abstract type AbstractControl end
 
 include("model/Model.jl")
 using .Model
