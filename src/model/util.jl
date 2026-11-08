@@ -40,6 +40,7 @@ RealInRange(min::Real, max::Real) =
     RealInRange(min, min, max)
 RealInRange(::Type{T}=Float64) where T<:Real =
     RealInRange(zero(T), zero(T), one(T))
+RealInRange(val::Real) = RealInRange(val, val)
 
 # Getters return values, not observables
 
