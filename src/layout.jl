@@ -21,23 +21,6 @@ function Controls(state::State)
     controls = state.controls
 
     return make_view(controls)
-
-    # Grid(
-    # Bonito.Label("Boundary Geometry"),
-    #
-    #
-    # )
-    #
-    #     return Grid(
-    #         Bonito.Label("Boundary Geometry"),
-    #         map(make_view, getchildren(state.controls, :boundary))...,
-    #         Bonito.Label("Boundary Conditions"),
-    #         map(make_view, getchildren(state.controls, :bc))...,
-    #     ;
-    #     justify_content="begin",
-    #     align_items="begin",
-    #     class="dashboard-controls",
-    # )
 end
 
 function Controls(session::Session)

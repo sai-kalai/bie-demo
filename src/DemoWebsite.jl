@@ -14,8 +14,6 @@ using BoundaryIntegralPDE.DevTools
 include("model/Model.jl")
 using .Model
 
-include("tree.jl")
-include("control.jl")
 include("compute.jl")
 include("state.jl")
 include("view.jl")

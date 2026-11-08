@@ -19,10 +19,6 @@ function default_state()
 end
 
 
-# global registry for debugging
-# const SESSIONS = Dict{SessionID, State}()
-
-
 const APP_STATE_KEY = :demowebsite_state
 
 function set_state!(session, state)
@@ -83,39 +79,6 @@ function list_sessions(server::Server=Bonito.get_server())
         ]
     end
 end
-
-# TODO: config struct with fixed schema for a specific application
-
-#NOTE: Takeaway: tree is too flexible
-# function problem_from_controls(tree::Node)
-#
-#     t = get(tree, :boundary, :numpoints) |> Model.value |> get_t
-#
-#     b = DiscreteClosedCurve(t, (t) -> starfish(
-#         t;
-#         t0=get(tree, :boundary, :rotation) |> oldvalue,
-#         R=get(tree, :boundary, :size) |> oldvalue,
-#         a=get(tree, :boundary, :ampl) |> oldvalue,
-#         w=get(tree, :boundary, :freq) |> oldvalue,
-#     ))
-#
-#     bc_fn = (_t) -> begin
-#         A = get(tree, :bc, :ampl) |> oldvalue # maybe getvalue?
-#         α = get(tree, :bc, :alpha) |> oldvalue
-#         ω = get(tree, :bc, :omega) |> oldvalue
-#         ϕ = get(tree, :bc, :phase) |> oldvalue
-#         μ = get(tree, :bc, :center) |> oldvalue
-#
-#         return (A / (α * sqrt(2pi))) * exp(-(_t - μ)^2 / (2α^2)) * sin(ω * _t + ϕ)
-#     end
-#
-#     bc = Dirichlet(
-#         bc_fn.(t)
-#     )
-#
-#     pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
-#     return pb
-# end
 
 function problem_from_controls(controls::ControlState)
 

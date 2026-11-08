@@ -3,9 +3,6 @@ Representation of the application state: the problem, solution, and algorithm
 and also the controllable parameters
 """
 
-#NOTE: Takeaway: a clear distinction on the two sides of state is needed,
-#possibly exposed through individual services: "controls", "simulation", "scheduling"
-
 struct State{S,T,C}
     sol::Observable{S} # solution to a bvp, contains full information about
     # computed boundary shape, conditions, results
