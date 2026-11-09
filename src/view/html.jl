@@ -1,5 +1,5 @@
 # Definition of how the HTML representation of control elements
-#
+
 using Printf
 
 function make_view(c::ControlState)
@@ -49,7 +49,9 @@ end
 
 function make_view(x::Choice)
 
-    names = choices(x) |> collect
+    names = keys(x) |> collect
+
+    @info names
 
     dropdown = Bonito.Dropdown(
         names;

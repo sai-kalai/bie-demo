@@ -29,12 +29,12 @@ end
 # convert struct to named tuple for kwarg splatting
 # effectively "snapshot"
 # This is i think the main friction with the new, heterogeneous, static schema
-function tonamedtuple(x::Union{BCShape,BoundaryShape})
+function tonamedtuple(x)
     names = fieldnames(typeof(x))
     values = (value(getfield(x, name)) for name in names)
     return NamedTuple{names}(values)
 end
-function toobservables(x::Union{BCShape,BoundaryShape})
+function toobservables(x)
     names = fieldnames(typeof(x))
     values = (observable(getfield(x, name)) for name in names)
     return NamedTuple{names}(values)
@@ -60,7 +60,7 @@ function Circle()
     return Circle(RealInRange(0.5, 1.5))
 end
 function (b::Circle)(t::Number)
-    return (b.R * cos(t), b.R * sin(t))
+    return (b.R[] * cos(t), b.R[] * sin(t))
 end
 
 
@@ -69,3 +69,6 @@ const BOUNDARY_SHAPES = (Starfish, Circle)
 function subtypes(::Type{BoundaryShape})
     return BOUNDARY_SHAPES # unionalls
 end
+
+
+observables(x::BoundaryShape) = (observable(f) for f in fielditerator(x))

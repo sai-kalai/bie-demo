@@ -86,3 +86,14 @@ const BC_SHAPES = (Bump, Sinusoidal, WavePacket)
 function subtypes(::Type{BCShape})
     return BC_SHAPES
 end
+
+# TODO: i really dislike this manual workflow but this interface is probably the correct
+# way to subscribe to any of the sub-observables
+
+# observables(x::Sinusoidal) = (observables(x.A)..., observables(x.ω)..., observables(x.ϕ)...)
+# observables(x::Bump) = (observables(x.A)..., observables(x.μ)..., observables(x.α)...)
+# observables(x::WavePacket) = (observables(x.A)..., observables(x.μ)..., observables(x.α)...)
+
+
+
+observables(x::BCShape) = (observable(f) for f in fielditerator(x))
