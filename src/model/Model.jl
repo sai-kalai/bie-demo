@@ -4,35 +4,12 @@ module Model
 # domain geometry and parameters, boundary condition shapes and parameters,
 # solver configuration, etc.
 
-using Observables
 using BoundaryIntegralPDE
+using Observables
 
-export ControlState, value, setvalue!, chosen, setchosen!, choices
-export Choice, RealInRange, Switch
-export observable, observable_max, observable_min
-export tonamedtuple
+include("state.jl")
 
-include("util.jl")
-include("boundary.jl")
-include("bc.jl")
+export SimulationState, simulate, simulate!
 
-# strongly typed, tracks state of controls
-struct ControlState
-    hotreaload::Switch
-    numpoints::RealInRange{Int}
-    boundaryshape::Choice{BoundaryShape}
-    bcshape::Choice{BCShape}
-end
-
-
-function ControlState()
-    return ControlState(
-        Switch(),
-        RealInRange(40, 100),
-        Choice(BoundaryShape),
-        Choice(BCShape)
-    )
-
-end
 
 end # module Model

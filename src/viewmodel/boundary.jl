@@ -53,18 +53,18 @@ function (b::Starfish)(t::Number)
     )
 end
 
-struct Circle{T} <: BoundaryShape
+struct Circumference{T} <: BoundaryShape
     R::RealInRange{T}
 end
-function Circle()
-    return Circle(RealInRange(0.5, 1.5))
+function Circumference()
+    return Circumference(RealInRange(0.5, 1.5))
 end
-function (b::Circle)(t::Number)
+function (b::Circumference)(t::Number)
     return (b.R[] * cos(t), b.R[] * sin(t))
 end
 
 
-const BOUNDARY_SHAPES = (Starfish, Circle)
+const BOUNDARY_SHAPES = (Starfish, Circumference)
 
 function subtypes(::Type{BoundaryShape})
     return BOUNDARY_SHAPES # unionalls

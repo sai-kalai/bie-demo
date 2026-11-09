@@ -1,6 +1,10 @@
 
 module View
 
+# TODO: make this an ext package to support different plotting/etc
+using ..ViewModel
+using ..Model
+
 using Bonito
 using WGLMakie
 

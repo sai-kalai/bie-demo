@@ -9,6 +9,26 @@
 
 Create a dashboard container with a semantic CSS class.
 """
+struct ApplicationState{C,S}
+    controls::C
+    simulation::S
+end
+
+# Default state
+function ApplicationState()
+    controls = ViewModel.ControlState()
+
+    prob = make_prob(controls)
+    alg = make_alg(controls)
+
+    sol = simulate(prob, alg)
+
+    return ApplicationState(
+        controls,
+        SimulationState(Observable(prob), Observable(alg), Observable(sol))
+    )
+end
+
 function DefaultCard(content=DOM.div(); class_name)
     return Card(content; class=class_name)
 end
@@ -87,26 +107,7 @@ Definition of the logic to create a webapp and serve it
 
 """
 
-struct ApplicationState{C,S}
-    controls::C
-    simulation::S
-end
 
-# Default state
-function ApplicationState()
-    controls = ViewModel.ControlState()
-
-    prob = make_prob(controls)
-    alg = make_alg(controls)
-    target = make_target(controls)
-
-    sol = simulate(prob, alg, target)
-
-    return ApplicationState(
-        controls,
-        SimulationState(Observable(prob), Observable(alg), Observable(sol))
-    )
-end
 
 
 const APP_STATE_KEY = :demowebsite_state
@@ -137,7 +138,9 @@ function make_app()
 
         # hotreload on any user input
         onany((ctr |> observables)...) do args...
-            sync!(state.simulation, state.controls)
+
+            @info "syncing states"
+            @time sync!(state.simulation, state.controls)
         end
 
         dashboard = Dashboard(session)

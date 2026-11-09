@@ -92,7 +92,7 @@ intformat(v) = @sprintf("%d", v)
 
 # NOTE: this seems tedious to define individually, but may be the correct choice
 # TODO: find a better abstraction for defining formatting
-function make_view(x::Model.Starfish)
+function make_view(x::Starfish)
     return Bonito.DOM.div(
         Bonito.Label("Size"),
         make_view(x.R; length=100, format=floatformat),
@@ -105,14 +105,14 @@ function make_view(x::Model.Starfish)
     )
 end
 
-function make_view(x::Model.Circle)
+function make_view(x::Circumference)
     return Bonito.DOM.div(
         Bonito.Label("Size"),
         make_view(x.R; length=100, format=floatformat),
     )
 end
 
-function make_view(x::Model.Bump)
+function make_view(x::Bump)
     return Bonito.DOM.div(
         Bonito.Label("Amplitude"),
         make_view(x.A; length=100, format=floatformat),
@@ -123,7 +123,7 @@ function make_view(x::Model.Bump)
     )
 end
 
-function make_view(x::Model.Sinusoidal)
+function make_view(x::Sinusoidal)
     return Bonito.DOM.div(
         Bonito.Label("Amplitude"),
         make_view(x.A; length=100, format=floatformat),
@@ -134,7 +134,7 @@ function make_view(x::Model.Sinusoidal)
     )
 end
 
-function make_view(x::Model.WavePacket)
+function make_view(x::WavePacket)
     return Bonito.DOM.div(
         Bonito.Label("Amplitude"),
         make_view(x.A; length=100, format=floatformat),

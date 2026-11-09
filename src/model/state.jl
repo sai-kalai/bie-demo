@@ -30,11 +30,10 @@ end
 # end
 
 
-function simulate!(state::SimulationState, target)
+function simulate!(state::SimulationState)
     sol = simulate(
         state._prob[],
         state._alg[],
-        target,
     )
 
     # update observable state
@@ -44,6 +43,30 @@ function simulate!(state::SimulationState, target)
 end
 
 
-function simulate(prob, alg, target)
-    return solve(prob, alg; target=target)
+# NOTE: singleton for now, optimize later
+# Actually domain needs to grow... either keep largest or disallow domain changing
+# size, this costs. but measure first how much actually. And also implement
+# evaluation from generator to avoid bulk heap allocation
+# target = nothing
+
+
+
+function make_target(prob; n_grid=50)
+
+    # global target
+
+    # if !isnothing(target)
+    # return target
+    # end
+
+    xmin, xmax, ymin, ymax = extrema(prob.boundary) # TODO remove this coupling, but need to include target in bvp definition upstream
+    # TODO: dont define eval domain every time
+    xs = range(xmin, xmax, length=n_grid)
+    ys = range(ymin, ymax, length=n_grid)
+    target = stack((x, y) for y in ys for x in xs)
+    return target
+end
+
+function simulate(prob, alg) # NOTE: splatting for now, solve later upstream
+    return solve(prob, alg...; target=make_target(prob))
 end

@@ -3,12 +3,20 @@
 
 module ViewModel
 
+using Observables
+using DemoWebsite: get_t
+
+using BoundaryIntegralPDE # coupling here, but might be fine
+
 export ControlState, value, setvalue!, chosen, setchosen!, choices
 export Choice, RealInRange, Switch
 export observable, observable_max, observable_min, observables
 export tonamedtuple
 
-export make_prob, make_alg, make_target
+export Circumference, Starfish
+export Bump, Sinusoidal, WavePacket
+
+export make_prob, make_alg
 
 include("util.jl")
 include("bc.jl")
@@ -46,7 +54,7 @@ observables(x::ControlState) = (observables(f) for f in fielditerator(x)) |> Ite
 
 function make_prob(controls::ControlState)
 
-    t = controls.numpoints |> value |> get_t
+    t = controls.numpoints[] |> get_t
 
     b = DiscreteClosedCurve(t, (t) -> (controls.boundaryshape[])(t))
 
@@ -66,18 +74,9 @@ end
 
 # NOTE: WIP
 function make_alg(controls::ControlState)
-    return IndirectBVPAlgorithm(evalmethod=CauchyIntegral()), IndirectBIEAlgorithm()
+    return IndirectBVPAlgorithm(evalmethod=DistancePolicy(0.05)), IndirectBIEAlgorithm()
 end
 
-function make_target(controls; n_grid=50)
-
-    xmin, xmax, ymin, ymax = extrema(pb.boundary)
-
-    # TODO: dont define eval domain every time
-    xs = range(xmin, xmax, length=n_grid)
-    ys = range(ymin, ymax, length=n_grid)
-    x_test = stack((x, y) for y in ys for x in xs)
-end
 
 
 end

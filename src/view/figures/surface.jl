@@ -1,5 +1,7 @@
 # Definition of the surface plot
 
+using DemoWebsite: get_t
+using BoundaryIntegralPDE: data
 
 function surface_plot(state::SimulationState; figsize=(200, 400))
     fig = Figure(; size=figsize)
@@ -24,6 +26,9 @@ function surface_plot(state::SimulationState; figsize=(200, 400))
         ylabel="Boundary Condition",
         tellwidth=false,
     )
+
+    # TODO: coupling here to BoundaryIntegralPDE
+    #   need to provide interface to access data regardless, without plumbing
 
     lns = lines!(ax2,
         @lift(get_t($(state._sol).prob.bc |> data |> length)),
