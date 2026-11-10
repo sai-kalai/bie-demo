@@ -18,10 +18,10 @@ end
 function ApplicationState()
     controls = ViewModel.ControlState()
 
-    prob = make_prob(controls)
-    alg = make_alg(controls)
+    prob = ViewModel.make_prob(controls)
+    alg = ViewModel.make_alg(controls)
 
-    sol = simulate(prob, alg)
+    sol = Model.simulate(prob, alg)
 
     return ApplicationState(
         controls,
