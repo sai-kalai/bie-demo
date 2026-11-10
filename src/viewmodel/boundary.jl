@@ -23,22 +23,6 @@ function Starfish()
     )
 end
 
-# NOTE: Takeaway: api for setting bounds of realinrange clamps the value
-# is there a way to listen for changes in any of the members? should RealInRange
-# itself be in an observable
-# convert struct to named tuple for kwarg splatting
-# effectively "snapshot"
-# This is i think the main friction with the new, heterogeneous, static schema
-function tonamedtuple(x)
-    names = fieldnames(typeof(x))
-    values = (value(getfield(x, name)) for name in names)
-    return NamedTuple{names}(values)
-end
-function toobservables(x)
-    names = fieldnames(typeof(x))
-    values = (observable(getfield(x, name)) for name in names)
-    return NamedTuple{names}(values)
-end
 function (b::Starfish)(t::Number)
     return BoundaryIntegralPDE.starfish(
         t;

@@ -4,19 +4,32 @@
 module ViewModel
 
 using Observables
-using DemoWebsite: get_t
 
-using BoundaryIntegralPDE # coupling here, but might be fine
+using ..Model
 
 export ControlState, value, setvalue!, chosen, setchosen!, choices
 export Choice, RealInRange, Switch
 export observable, observable_max, observable_min, observables
-export tonamedtuple
 
 export Circumference, Starfish
 export Bump, Sinusoidal, WavePacket
 
-export make_prob, make_alg
+# export make_prob, make_alg
+
+# NOTE: Takeaway: api for setting bounds of realinrange clamps the value
+# is there a way to listen for changes in any of the members? should RealInRange
+# itself be in an observable
+
+# convert struct fields to named tuple for kwarg splatting
+function tonamedtuple(x)
+    names = fieldnames(typeof(x))
+    values = (value(getfield(x, name)) for name in names)
+    return NamedTuple{names}(values)
+end
+function fielditerator(x)
+    names = fieldnames(typeof(x))
+    return (getfield(x, name) for name in names)
+end
 
 include("util.jl")
 include("bc.jl")
@@ -30,10 +43,6 @@ struct ControlState
     bcshape::Choice{BCShape}
 end
 
-function fielditerator(x)
-    names = fieldnames(typeof(x))
-    return (getfield(x, name) for name in names)
-end
 
 
 function ControlState()
@@ -52,31 +61,25 @@ end
 
 observables(x::ControlState) = (observables(f) for f in fielditerator(x)) |> Iterators.flatten
 
-function make_prob(controls::ControlState)
+#NOTE: is the right thing to overload Model's function or to have
+#two separate ones?
+function Model.make_prob(controls::ControlState)
 
-    t = controls.numpoints[] |> get_t
+    return Model.make_prob(
+        controls.numpoints[],
+        :Laplace,
+        controls.boundaryshape[],
+        :Dirichlet,
+        controls.bcshape[],
+        :Interior,
+    )
 
-    b = DiscreteClosedCurve(t, (t) -> (controls.boundaryshape[])(t))
-
-    # don't like calling value here, need "snapshot" that has the same shape as the
-    # state struct but where the fields are a concrete numeric type, not RealInRange
-    bc_fn = controls.bcshape[]
-
-
-    # Dirichlet and Laplace need to be in the controls)
-    bc = Dirichlet(bc_fn.(t))
-
-
-    pb = BoundaryValueProblem(Laplace(), bc, Interior(), b)
-
-    return pb
 end
 
 # NOTE: WIP
-function make_alg(controls::ControlState)
-    return IndirectBVPAlgorithm(evalmethod=DistancePolicy(0.05)), IndirectBIEAlgorithm()
+function Model.make_alg(controls::ControlState)
+    return Model.make_alg(:Indirect, 0.05)
 end
-
 
 
 end
