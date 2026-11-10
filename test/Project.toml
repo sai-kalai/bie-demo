@@ -1,0 +1,8 @@
+[deps]
+DemoWebsite = "362f5ef0-bbd3-48d5-bb8b-c7f8d81d37ed"
+Observables = "510215fc-4207-5dde-b226-833fc4488ee2"
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[sources]
+DemoWebsite = {path = ".."}
