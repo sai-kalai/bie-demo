@@ -124,8 +124,8 @@ struct Choice{A}
     _choices::Dict{Symbol,A} # keep other variants alive to restore previous state # TODO: maybe namedtuple here
 end
 function Choice(choices...)
-    choices = Dict(c|>typeof|>nameof=>c for c in choices) # not sure if nameof type is expressive enough as keys...
-    return Choice(choices|>keys|>first|>Observable, choices)
+    choices = Dict(c |> typeof |> nameof => c for c in choices) # not sure if nameof type is expressive enough as keys...
+    return Choice(choices |> keys |> first |> Observable, choices)
 end
 # convenience constructor for union of types that support zero-argument ctor
 function Choice(u::Union)
