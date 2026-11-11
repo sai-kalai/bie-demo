@@ -7,12 +7,14 @@ using Observables
 
 using ..Model
 
-export ControlState, value, setvalue!, chosen, setchosen!, choices
-export Choice, RealInRange, Switch
+export ControlState
+
+export Choice, RealInRange, Switch, value, setmaximum!, setminimum!, setvalue!,
+    chosen, setchosen!, choices
 export observable, observable_max, observable_min, observables
 
-export Circumference, Starfish
-export Bump, Sinusoidal, WavePacket
+export BoundaryShape, Circumference, Starfish
+export BCShape, Bump, Sinusoidal, WavePacket
 
 # export make_prob, make_alg
 
@@ -36,12 +38,13 @@ include("bc.jl")
 include("boundary.jl")
 
 # strongly typed, tracks state of controls
-struct ControlState
+struct ControlState{B,BC}
     hotreaload::Switch
     numpoints::RealInRange{Int}
-    boundaryshape::Choice{AbstractBoundaryShape} # redundant, always the same?
-    bcshape::Choice{AbstractBCShape}
+    boundaryshape::Choice{B} # redundant, always the same?
+    bcshape::Choice{BC}
 end
+
 
 
 function ControlState()
