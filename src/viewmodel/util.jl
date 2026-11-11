@@ -157,15 +157,6 @@ Base.keys(x::Choice) = keys(x._choices)
 Base.values(x::Choice) = values(x._choices)
 choices(x::Choice) = x._choices
 
-function setchosen!(x::Choice, key::Symbol)
-    haskey(x._choices, key) ||
-        throw(ArgumentError("Unknown choice: $key, expected one of $(x._choices|>keys|>collect)"))
-    x._chosen[] = key
-    return value(x)
-end
-function Base.setindex!(x::Choice, key::Symbol)
-    setchosen!(x, key)
-end
 
 struct Switch
     _value::Observable{Bool}
@@ -191,6 +182,9 @@ observable(x::Switch) = x._value
 # get all the observables in the options
 observables(x::RealInRange) = (observable(x), observable_min(x), observable_max(x))
 observables(x::Switch) = (observable(x),)
-observables(x::Choice) = x |> values .|> observables |> Iterators.flatten |> collect
+observables(x::Choice) = (observable(x), (x |> values .|> observables |> Iterators.flatten)...)
+
+# base case: empty list
+observables(::Any) = ()
 
 
