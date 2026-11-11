@@ -1,6 +1,9 @@
 [deps]
+Bonito = "824d6782-a2ef-11e9-3a09-e5662e0c26f8"
 DemoWebsite = "362f5ef0-bbd3-48d5-bb8b-c7f8d81d37ed"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 Observables = "510215fc-4207-5dde-b226-833fc4488ee2"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
