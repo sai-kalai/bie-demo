@@ -7,14 +7,8 @@ module Model
 using BoundaryIntegralPDE
 using Observables
 
-# this is core model?
-# i guess the core entities of this project are defined here
-# export BoundaryIntegralPDE
-#
 include("state.jl")
 
-export SimulationState, make_sol, simulate!
-export make_prob, make_alg
-
+export SimulationState, make_prob, make_alg, make_sol, simulate!
 
 end # module Model

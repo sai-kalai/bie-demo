@@ -1,14 +1,6 @@
 
 module DemoWebsite
 
-using Observables
-using Bonito
-using WGLMakie
-
-
-using BoundaryIntegralPDE
-using BoundaryIntegralPDE.DevTools
-
 # abstract type AbstractControl end
 
 # util, temporary fix
@@ -29,16 +21,12 @@ include("startup.jl")
 include("application.jl")
 
 
-export Model
-
-export DefaultCard, Controls, Dashboard, make_app
-
+# export Model
 
 export start_server, make_app
 
 export main
 
-export make_view
 
 
 function main()
