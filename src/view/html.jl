@@ -26,20 +26,13 @@ function make_view(x::RealInRange; step=nothing, length=nothing, format=nothing)
     end
 
     slider = Bonito.StylableSlider(
-        range(x |> minimum, x |> maximum; step=step, length=length),
+        range(x |> minimum, x |> maximum; step=step, length=length)
     )
-
-    # Browser -> Julia
-    on(slider.value) do v
-        setvalue!(x, v)
-    end
 
     slider[] = value(x)
 
-    # getindex assign works
-    on(observable(x);) do _
-        slider[] = value(x)
-    end
+    # prevents client side snapping from feeding back
+    ObservablePair(slider, observable(x))
 
     # probably better to label with slider value instead of source of truth to
     # avoid one ws message.
@@ -53,22 +46,15 @@ function make_view(x::Choice)
 
     @info names
 
+
     dropdown = Bonito.Dropdown(
         names;
         index=findfirst(==(chosen(x)), names),
         option_to_string=string,
     )
 
-    # Browser -> Julia
-    on(dropdown.value) do key
-        # equal check may be redundant if put in model but might be better to save network cost
-        chosen(x) == key || setchosen!(x, key)
-    end
+    ObservablePair(dropdown.value, observable(x))
 
-    # Julia -> Browser
-    on(observable(x)) do key
-        dropdown.value[] == key || (dropdown.value[] = key)
-    end
 
     # The selected variant determines which controls are displayed.
     variant_view = map(observable(x)) do _
@@ -148,4 +134,5 @@ function make_view(x::WavePacket)
         make_view(x.ϕ; length=100, format=floatformat),
     )
 end
+
 
