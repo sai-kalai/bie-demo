@@ -12,6 +12,10 @@ struct SimulationState{P,A,S}
     _sol::Observable{S} # solution to a bvp, contains full information about prob and alg anyways...
 end
 
+# problem(s::SimulationState) = s._prob[]
+# algorithm(s::SimulationState) = s._alg[]
+# solution(s::SimulationState) = s._sol[]
+
 
 function SimulationState(prob, alg, sol)
     return SimulationState(
