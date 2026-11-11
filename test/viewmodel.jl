@@ -32,9 +32,8 @@ rir() = RealInRange(randn(), randn() - 10, randn() + 10)
 
         # factory methods for input data of simulations
         prob = make_prob(c)
-
         alg = make_alg(c)
-
+        # missing link here to simulate
 
 
     end
