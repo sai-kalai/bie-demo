@@ -52,25 +52,20 @@ function ControlState()
         Choice(BoundaryShape),
         Choice(BCShape)
     )
-
 end
-
 
 # "snapshot" functions to take current state of observables from ViewModel state
 # application layer can use these to construct and run sumulation
 
 observables(x::ControlState) = (observables(f) for f in fielditerator(x)) |> Iterators.flatten
 
-#NOTE: is the right thing to overload Model's function or to have
-#two separate ones?
 function Model.make_prob(controls::ControlState)
-
     return Model.make_prob(
         controls.numpoints[],
         :Laplace,
-        controls.boundaryshape[],
+        (t) -> controls.boundaryshape[](t), # pass callables
         :Dirichlet,
-        controls.bcshape[],
+        (t) -> controls.bcshape[](t),
         :Interior,
     )
 
