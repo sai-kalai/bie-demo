@@ -47,11 +47,27 @@ RealInRange(::Type{T}=Float64) where T<:Real =
     RealInRange(zero(T), zero(T), one(T))
 RealInRange(val::Real) = RealInRange(val, val)
 
+
+function Base.:(==)(a::RealInRange, b::RealInRange)
+    #
+    c1 = a._value[] == b._value[]
+
+    c2 = a._max[] == b._max[]
+
+    c3 = a._min[] == b._min[]
+    return c1 && c2 && c3
+
+end
+
 # Getters return values, not observables
 
 value(x::RealInRange) = x._value[]
+function Base.getindex(x::RealInRange{T}) where T
+    value(x)
+end
 Base.minimum(x::RealInRange) = x._min[]
 Base.maximum(x::RealInRange) = x._max[]
+Base.extrema(x::RealInRange) = (minimum(x), maximum(x))
 
 # Setters
 function setvalue!(x::RealInRange{T}, v::Real) where T
@@ -64,9 +80,6 @@ end
 # this should be the preferred api
 function Base.setindex!(x::RealInRange{T}, v::Real) where T
     setvalue!(x, v)
-end
-function Base.getindex(x::RealInRange{T}) where T
-    value(x)
 end
 # TODO: experiment with setindex! and notify() to provide observable-like api
 # also how to make setters also use setindex?
