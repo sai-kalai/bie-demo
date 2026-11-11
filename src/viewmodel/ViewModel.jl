@@ -39,10 +39,9 @@ include("boundary.jl")
 struct ControlState
     hotreaload::Switch
     numpoints::RealInRange{Int}
-    boundaryshape::Choice{BoundaryShape}
-    bcshape::Choice{BCShape}
+    boundaryshape::Choice{AbstractBoundaryShape} # redundant, always the same?
+    bcshape::Choice{AbstractBCShape}
 end
-
 
 
 function ControlState()
@@ -75,7 +74,6 @@ end
 function Model.make_alg(controls::ControlState)
     return Model.make_alg(:Indirect, 0.05)
 end
-
 
 end
 
