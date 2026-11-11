@@ -1,7 +1,7 @@
 
-abstract type BCShape end
+abstract type AbstractBCShape end
 
-struct Bump{T} <: BCShape
+struct Bump{T} <: AbstractBCShape
     A::RealInRange{T}   #amplitude
     α::RealInRange{T} # stdev
     μ::RealInRange{T} #mean
@@ -25,7 +25,7 @@ function bump(t; A, α, μ)
     (A / (α * sqrt(2pi))) * exp(-(t - μ)^2 / (2α^2))
 end
 
-struct Sinusoidal{T} <: BCShape
+struct Sinusoidal{T} <: AbstractBCShape
     A::RealInRange{T}
     ω::RealInRange{T} # wavenumber
     ϕ::RealInRange{T}
@@ -45,7 +45,7 @@ function sinusoidal(
     return A * sin(ω * t + ϕ)
 end
 
-struct WavePacket{T} <: BCShape
+struct WavePacket{T} <: AbstractBCShape
     A::RealInRange{T}
     α::RealInRange{T}
     ω::RealInRange{T}
@@ -74,18 +74,10 @@ end
 #and the thumbs in html move automatically
 function (b::WavePacket)(t::Real)
     # TODO: another problem: this constructor doesn't work
-    sine = Sinusoidal(RealInRange(1.), b.ω, b.ϕ)
-    bmp = Bump(RealInRange(1.), b.α, b.μ)
-    # TODO: also awkward value call here...
-    return value(b.A) * bmp(t) * sine(t)
+    return b.A[] * bump(t; A=1, α=b.α[], μ=b.μ[]) * sinusoidal(t; A=1, ω=b.ω[], ϕ=b.ϕ[])
 
 end
 
-const BC_SHAPES = (Bump, Sinusoidal, WavePacket)
-
-function subtypes(::Type{BCShape})
-    return BC_SHAPES
-end
 
 # TODO: i really dislike this manual workflow but this interface is probably the correct
 # way to subscribe to any of the sub-observables
@@ -94,6 +86,7 @@ end
 # observables(x::Bump) = (observables(x.A)..., observables(x.μ)..., observables(x.α)...)
 # observables(x::WavePacket) = (observables(x.A)..., observables(x.μ)..., observables(x.α)...)
 
-
+BCShape = Union{Bump,Sinusoidal,WavePacket}
 
 observables(x::BCShape) = (observable(f) for f in fielditerator(x))
+

@@ -1,6 +1,8 @@
 # Definition of the geometry types
 
-abstract type BoundaryShape end
+abstract type AbstractBoundaryShape end
+
+import BoundaryIntegralPDE: starfish
 
 # needs to be callable on a list of parameter values...
 
@@ -8,7 +10,7 @@ abstract type BoundaryShape end
 # representation can be used. This way, the same schema defined for the control
 # model can produce a valid snapshot with the observable current values at the
 # moment of the screenshot
-struct Starfish{T} <: BoundaryShape
+struct Starfish{T} <: AbstractBoundaryShape
     t0::RealInRange{T}
     R::RealInRange{T}
     a::RealInRange{T}
@@ -24,7 +26,7 @@ function Starfish()
 end
 
 function (b::Starfish)(t::Number)
-    return BoundaryIntegralPDE.starfish(
+    return starfish(
         t;
         # TODO: find a better abstraction that produces a snapshot of the control
         # model state. probably validation from the model itself is enough to trust
@@ -37,7 +39,7 @@ function (b::Starfish)(t::Number)
     )
 end
 
-struct Circumference{T} <: BoundaryShape
+struct Circumference{T} <: AbstractBoundaryShape
     R::RealInRange{T}
 end
 function Circumference()
@@ -48,11 +50,11 @@ function (b::Circumference)(t::Number)
 end
 
 
-const BOUNDARY_SHAPES = (Starfish, Circumference)
 
-function subtypes(::Type{BoundaryShape})
-    return BOUNDARY_SHAPES # unionalls
-end
+
+# TODO: how to automate testing of added shapes?
+
+BoundaryShape = Union{Starfish,Circumference}
 
 
 observables(x::BoundaryShape) = (observable(f) for f in fielditerator(x))
