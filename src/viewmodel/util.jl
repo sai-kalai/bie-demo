@@ -120,44 +120,35 @@ end
 # constructor
 # A is the abstract type
 struct Choice{A}
-    _chosen::Observable{Symbol} # currently selected #TODO: bad naming
+    _chosen::Observable{Symbol} # currently selected
     _choices::Dict{Symbol,A} # keep other variants alive to restore previous state # TODO: maybe namedtuple here
 end
-function Choice(::Type{A}) where A
-    isabstracttype(A) ||
-        throw(ArgumentError("$A must be abstract"))
-
-    variants = filter(T -> !isabstracttype(T), subtypes(A))
-
-    isempty(variants) &&
-        throw(ArgumentError("$A has no concrete direct subtypes"))
-
-    # sort!(variants; by=string)
-
-    choices = Dict{Symbol,A}()
-
-    for T in variants
-        key = Symbol(nameof(T))
-
-        # prob not needed
-        haskey(choices, key) &&
-            throw(ArgumentError("Duplicate variant name: $key"))
-
-        # must support default constructor
-        choices[key] = T()
-    end
-
-    return Choice{A}(Observable(choices |> keys |> first), choices)
+function Choice(choices...)
+    choices = Dict(c|>typeof|>nameof=>c for c in choices) # not sure if nameof type is expressive enough as keys...
+    return Choice(choices|>keys|>first|>Observable, choices)
+end
+# convenience constructor for union of types that support zero-argument ctor
+function Choice(u::Union)
+    return Choice((T() for T in Base.uniontypes(u))...)
 end
 
+# setters
+function setchosen!(x::Choice, key::Symbol)
+    haskey(x._choices, key) ||
+        throw(ArgumentError("Unknown choice: $key, expected one of $(x._choices|>keys|>collect)"))
+    x._chosen[] = key
+    return value(x)
+end
+function Base.setindex!(x::Choice, key::Symbol)
+    setchosen!(x, key)
+end
 # getters
 # #currently chosen key
 chosen(x::Choice)::Symbol = x._chosen[]
 # currently chosen value
-function value(x::Choice{A})::A where A
+function value(x::Choice)
     x._choices[chosen(x)]
 end
-
 function Base.getindex(x::Choice)
     return value(x)
 end
