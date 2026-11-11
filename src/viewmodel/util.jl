@@ -19,7 +19,7 @@ struct RealInRange{T<:Real}
         value::Observable{T},
         min::Observable{T},
         max::Observable{T}
-    ) where T
+    ) where {T}
 
         min[] <= max[] ||
             throw(ArgumentError("Minimum must be less than or equal to maximum"))
