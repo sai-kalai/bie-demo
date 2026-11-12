@@ -17,8 +17,8 @@ using .ViewModel
 using .View
 
 include("compute.jl")
-include("startup.jl")
 include("application.jl")
+include("startup.jl")
 
 
 # export Model
