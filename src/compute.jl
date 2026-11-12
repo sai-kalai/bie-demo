@@ -28,18 +28,12 @@
 # modify the application state by reading the client state
 function sync!(s::SimulationState, c::ControlState)
 
-
-    # here it could be checked what parts actually need updating
-
     # construct model from viewmodel
     s._prob[] = make_prob(c)
     s._alg[] = make_alg(c)
 
-
-
     # compute
     simulate!(s)
-
 
     return nothing
 end
