@@ -14,7 +14,7 @@ function ApplicationState()
     prob = ViewModel.make_prob(controls)
     alg = ViewModel.make_alg(controls)
 
-    sol = Model.simulate(prob, alg)
+    sol = Model.make_sol(prob, alg) # TODO: probably shouldn't be calling model directly
 
     return ApplicationState(
         controls,
