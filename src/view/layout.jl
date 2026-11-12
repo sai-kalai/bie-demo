@@ -12,35 +12,32 @@ function DefaultCard(content=DOM.div(); class_name)
     return Card(content; class=class_name)
 end
 
-function get_t(n)
-    range(0, 2π; length=n + 1)[1:(end-1)]
+
+function Controls(state::State)
+
+    controls = state.controls
+
+    return make_view(controls)
 end
 
-
 function Controls(session::Session)
-
     state = get_state(session)
-
-    return Grid(
-        Bonito.Label("Boundary Geometry"),
-        map(make_view, getchildren(state.controls, :boundary))...,
-        Bonito.Label("Boundary Conditions"),
-        map(make_view, getchildren(state.controls, :bc))...,
-        ;
-        justify_content="begin",
-        align_items="begin",
-        class="dashboard-controls",
-    )
+    return Controls(state)
 end
 
 function Dashboard(session::Session)
+    state = get_state(session)
+    Dashboard(state)
+end
+
+function Dashboard(state::State)
     # The plot that the frontend displays.
 
-    state = get_state(session)
 
     plot = surface_plot(state; figsize=(1300, 760))
 
-    controls = Controls(session)
+    controls = Controls(state)
+
 
     sidebar = DefaultCard(
         controls;

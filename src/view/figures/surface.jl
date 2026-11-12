@@ -1,13 +1,15 @@
 # Definition of the surface plot
 
-function surface_plot(state; figsize=(200, 400))
+using DemoWebsite: get_t
+using BoundaryIntegralPDE: data
 
+function surface_plot(state::SimulationState; figsize=(200, 400))
     fig = Figure(; size=figsize)
     # ax = Axis(fig[1, 1]; aspect=AxisAspect(1), tellheight=true)
     ax = Axis3(fig[1, 1])
 
 
-    tcf = surface!(ax, state.sol)
+    tcf = surface!(ax, state._sol)
 
     @info tcf
 
@@ -25,9 +27,12 @@ function surface_plot(state; figsize=(200, 400))
         tellwidth=false,
     )
 
+    # TODO: coupling here to BoundaryIntegralPDE
+    #   need to provide interface to access data regardless, without plumbing
+
     lns = lines!(ax2,
-        @lift(get_t($(state.sol).prob.bc |> data |> length)),
-        @lift($(state.sol).prob.bc |> data)
+        @lift(get_t($(state._sol).prob.bc |> data |> length)),
+        @lift($(state._sol).prob.bc |> data)
     )
 
     @info "done plotting"

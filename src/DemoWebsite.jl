@@ -1,42 +1,45 @@
 
 module DemoWebsite
 
+# abstract type AbstractControl end
 
-using Bonito
-using WGLMakie
+# util, temporary fix
+function get_t(n)
+    range(0, 2π; length=n + 1)[1:(end-1)]
+end
 
+include("model/Model.jl")
+include("viewmodel/ViewModel.jl")
+include("view/View.jl")
 
+using .Model
+using .ViewModel
+using .View
 
-using BoundaryIntegralPDE
-using BoundaryIntegralPDE.DevTools
-
-abstract type AbstractControl end
-
-include("tree.jl")
-include("control.jl")
 include("compute.jl")
-include("state.jl")
-include("view.jl")
+include("application.jl")
 include("startup.jl")
-include("layout.jl")
-include("figures/surface.jl")
 
 
-
-export DefaultCard, Controls, Dashboard, make_app
-
-export State
+# export Model
 
 export start_server, make_app
 
 export main
 
-export make_view
 
 function main()
+    # state = default_state()
+    @info "hehe"
     app = make_app()
     server = start_server(app)
+    @info server
+    wait(server)
 end
+# function main()
+#     app = make_app()
+#     server = start_server(app)
+# end
 
 
 end
