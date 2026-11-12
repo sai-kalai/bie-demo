@@ -28,11 +28,18 @@ export start_server, make_app
 export main
 
 
-
 function main()
+    # state = default_state()
+    @info "hehe"
     app = make_app()
     server = start_server(app)
+    @info server
+    wait(server)
 end
+# function main()
+#     app = make_app()
+#     server = start_server(app)
+# end
 
 
 end
