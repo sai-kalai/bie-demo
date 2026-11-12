@@ -44,16 +44,24 @@ function make_app(view_factory=Dashboard)
 
         set_state!(session, state)
 
-        @info session
-
         ctr = state.controls
 
 
+        timestamp = time_ns()
+
         # hotreload on any user input
         onany((ctr |> observables)...) do args...
-
             @info "syncing states"
-            @time sync!(state.simulation, state.controls)
+
+            delta = (time_ns() - timestamp) ÷ 10^6
+
+            if delta > 16 # 16 ms approx 60 fps
+                # i += 1
+                # acc += delta
+                @time sync!(state.simulation, state.controls)
+                # @warn delta
+                timestamp = time_ns()
+            end
         end
 
         dashboard = Dashboard(session)
