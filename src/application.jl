@@ -89,7 +89,11 @@ function make_app(view_factory=Dashboard)
 end
 
 function start_server(app)
-    server = Server(app, "0.0.0.0", 8080)
-    route!(server, "/" => app)
+    server = Server(
+        app,
+        "0.0.0.0",
+        8080;
+        proxy_url=".",
+    )
     return server
 end
