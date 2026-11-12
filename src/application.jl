@@ -32,13 +32,25 @@ function get_state(session)
     Bonito.get_metadata(session, APP_STATE_KEY) # crash here if no state
 end
 
+function list_sessions(server::Server=Bonito.get_server())
+    lock(server.websocket_routes.lock) do
+        [
+            conn.session
+            for (_, conn) in server.websocket_routes.table
+            if conn isa Bonito.WebSocketConnection &&
+                !isnothing(conn.session)
+        ]
+    end
+end
+
 function make_app(view_factory=Dashboard)
+
     # Load the external stylesheet as a Bonito asset.
     stylesheet = Bonito.Asset(
         joinpath(@__DIR__, "..", "assets", "styles.css")
     )
 
-    return App() do session, request
+    return App(; title="PDE Visualization") do session, request
 
         state = ApplicationState()
 
@@ -64,24 +76,15 @@ function make_app(view_factory=Dashboard)
             end
         end
 
-        dashboard = Dashboard(session)
         # @info os
         # TODO: compute initial state in this callback so that it's unique to the session
-        DOM.div(
+        r = DOM.div(
             stylesheet,
-            DOM.div(dashboard; class="dashboard-root"),
+            DOM.div(view_factory(state); class="dashboard-root"),
         )
-    end
-end
+        # @info session.parent
+        return r
 
-function list_sessions(server::Server=Bonito.get_server())
-    lock(server.websocket_routes.lock) do
-        [
-            conn.session
-            for (_, conn) in server.websocket_routes.table
-            if conn isa Bonito.WebSocketConnection &&
-                !isnothing(conn.session)
-        ]
     end
 end
 
