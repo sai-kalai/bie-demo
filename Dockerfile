@@ -1,16 +1,18 @@
 FROM julia:1.12
 
-ENV JULIA_NUM_THREADS=auto
+ENV JULIA_CPU_THREADS=4
 
 WORKDIR /app
 
 COPY Project.toml ./
 
-RUN julia --project=. -e 'using Pkg; Pkg.instantiate(; verbose=true)'
+RUN apt-get update && apt-get install -y time
+
+RUN /usr/bin/time -v julia --project=. -e 'using Pkg; Pkg.instantiate(; verbose=true)'
 
 COPY . .
 
-RUN julia --project=. -e 'using Pkg; Pkg.precompile()'
+RUN /usr/bin/time -v julia --project=. -e 'using Pkg; Pkg.precompile()'
 
 EXPOSE 8080
 

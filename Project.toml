@@ -5,15 +5,12 @@ version = "0.1.0"
 [deps]
 Bonito = "824d6782-a2ef-11e9-3a09-e5662e0c26f8"
 BoundaryIntegralPDE = "58b2a5b9-46a1-47d2-a141-e25d04a557d9"
-Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 JSExpr = "97c1335a-c9c5-57fe-bc5d-ec35cebe8660"
 Observables = "510215fc-4207-5dde-b226-833fc4488ee2"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-ProfileView = "c46f51b8-102a-5cf2-8d2c-8597cb0e0da7"
-Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 WGLMakie = "276b4fcb-3e11-5398-bf8b-a0c2d153d008"
 
 [sources]
-BoundaryIntegralPDE = {url = "https://github.com/sai-kalai/BoundaryIntegralPDE.jl.git",rev = "dev"}
+BoundaryIntegralPDE = {url = "https://github.com/sai-kalai/BoundaryIntegralPDE.jl.git",rev = "refactor/deps-docker"}
 

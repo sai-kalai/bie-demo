@@ -1,0 +1,10 @@
+[deps]
+DemoWebsite = "362f5ef0-bbd3-48d5-bb8b-c7f8d81d37ed"
+Observables = "510215fc-4207-5dde-b226-833fc4488ee2"
+ProfileView = "c46f51b8-102a-5cf2-8d2c-8597cb0e0da7"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+bie-demo = "6ffd719d-382d-42e8-bc21-697a49dc131a"
+
+[sources]
+DemoWebsite = {path = ".."}
+bie-demo = {path = ".."}

@@ -1,0 +1,7 @@
+.env
+dev/
+test/
+Dockerfile
+Manifest.toml
+README.md
+tmp.txt
