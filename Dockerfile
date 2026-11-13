@@ -5,7 +5,7 @@ FROM julia:1.12
 WORKDIR /app
 
 COPY Project.toml .
-COPY Manifest.toml .
+# COPY Manifest.toml .
 # COPY build_sysimage.jl .
 # ADD src src/.
 
