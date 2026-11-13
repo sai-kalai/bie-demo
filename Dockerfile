@@ -26,4 +26,4 @@ RUN /usr/bin/time -v julia --project=. -e 'using Pkg; Pkg.precompile()' --heap-s
 
 #EXPOSE 8080
 
-CMD ["julia", "--project=.", "-e", "using DemoWebsite; app.jl"]
+CMD ["julia", "--project=.", "-e", "app.jl"]
