@@ -24,6 +24,6 @@ COPY . .
 
 RUN /usr/bin/time -v julia --project=. -e 'using Pkg; Pkg.precompile()' --heap-size-hint=6G
 
-EXPOSE 8080
+#EXPOSE 8080
 
-CMD ["julia", "--project=.", "-e", "using DemoWebsite; DemoWebsite.main()"]
+CMD ["julia", "--project=.", "-e", "using DemoWebsite; app.jl"]
