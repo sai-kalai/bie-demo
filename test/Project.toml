@@ -1,4 +1,5 @@
 [deps]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Bonito = "824d6782-a2ef-11e9-3a09-e5662e0c26f8"
 DemoWebsite = "362f5ef0-bbd3-48d5-bb8b-c7f8d81d37ed"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
@@ -9,4 +10,3 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [sources]
 DemoWebsite = {path = ".."}
-# BoundaryIntegralPDE = {path = "../cse4/thesis/BimDiff"}
